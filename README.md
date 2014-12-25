@@ -1,0 +1,4 @@
+KDEConfigurationKit
+===================
+
+Work in progress
