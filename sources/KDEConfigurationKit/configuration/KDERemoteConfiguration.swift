@@ -11,21 +11,29 @@ import UIKit
 let KDERemoteConfigurationWillStartNewCycleNotification = "KDERemoteConfigurationWillStartNewCycleNotification"
 let KDERemoteConfigurationDidEndCycleNotification = "KDERemoteConfigurationDidEndCycleNotification"
 
-//let KDERemoteConfigurationNewKeyDetectedNotification = ""
-//let KDERemoteConfigurationKeyRemovalDetectedNotification = ""
+let KDERemoteConfigurationNewKeyDetectedNotification = "KDERemoteConfigurationNewKeyDetectedNotification"
+let KDERemoteConfigurationValueChangedNotification = "KDERemoteConfigurationValueChangedNotification"
+let KDERemoteConfigurationKeyRemovalDetectedNotification = "KDERemoteConfigurationKeyRemovalDetectedNotification"
+
+let KDERemoteConfigurationKeyKey = "KDERemoteConfigurationKeyKey"
+let KDERemoteConfigurationNewValueKey = "KDERemoteConfigurationNewValueKey"
+let KDERemoteConfigurationOldValueKey = "KDERemoteConfigurationOldValueKey"
 
 public class KDERemoteConfiguration: NSObject {
     private var URLBuilder: KDEURLBuilder
     private var parser: KDERemoteConfigurationParser
 
     private lazy var fileDownloader: KDEFileDownloader = {
-        return KDEFileDownloader(beginBlock: self.fileDownloaderWillStart)
+        var downloader = KDEFileDownloader(beginBlock: self.fileDownloaderWillStart)
+        downloader.completionBlock = self.fileDownloaderCompletedWithData
+        return downloader
     }()
 
-    private var configuration: [String: String]
     private(set) var configurationDate: NSDate?
     private(set) var lastCycleDate: NSDate?
     private(set) var lastCycleError: NSError?
+
+    private var configuration: [String: String]
 
     // MARK: - Initialization & Deinitialization
     ////////////////////////////////////////////////////////////////////////////
@@ -44,7 +52,6 @@ public class KDERemoteConfiguration: NSObject {
         self.configuration = [:]
         super.init()
 
-        self.fileDownloader.completionBlock = self.fileDownloaderCompletedWithData
         self.fileDownloader.start()
     }
 
@@ -87,26 +94,52 @@ public class KDERemoteConfiguration: NSObject {
             //1. Parsing
             var parsingResult = self.parser.parseData(data)
             if let configuration = parsingResult.configuration {
-                //2. Analyzing changes
+                //2. Analyzing changes & new values
                 for (key, value) in configuration {
                     var existingValue = self[key]
                     self.configuration[key] = value
 
                     if let existingValue = existingValue {
                         if existingValue != value {
-                            //TODO: Notification value changed
+                            self.postNotificationNamed(KDERemoteConfigurationValueChangedNotification,
+                                userInfo: [
+                                    KDERemoteConfigurationKeyKey: key,
+                                    KDERemoteConfigurationOldValueKey: existingValue,
+                                    KDERemoteConfigurationNewValueKey: value
+                                ])
                         }
                     }
                     else {
-                        //TODO: Notification new key detected
+                        self.postNotificationNamed(KDERemoteConfigurationNewKeyDetectedNotification,
+                            userInfo: [
+                                KDERemoteConfigurationKeyKey: key,
+                                KDERemoteConfigurationNewValueKey: value
+                            ])
                     }
-
                 }
 
-                //3. Caching
+                //3. Analyzing removal
+                var newKeys = configuration.keys.array
+                var removedKeys = self.configuration.keys.array.filter({element in
+                    return !contains(newKeys, element)
+                })
+                for key in removedKeys {
+                    if let value = self.configuration[key] {
+                        self.configuration.removeValueForKey(key)
+
+                        self.postNotificationNamed(KDERemoteConfigurationKeyRemovalDetectedNotification,
+                            userInfo: [
+                                KDERemoteConfigurationKeyKey: key,
+                                KDERemoteConfigurationOldValueKey: value
+                            ])
+                    }
+                    //The else case should not happen anytime
+                }
+
+                //4. Caching
                 self.configuration = configuration
 
-                //4. Saving last cycle date
+                //5. Saving last cycle date
                 self.configurationDate = NSDate()
             }
             else {
@@ -116,7 +149,7 @@ public class KDERemoteConfiguration: NSObject {
         else {
             self.lastCycleError = error
         }
-            
+
         self.lastCycleDate = NSDate()
         self.postNotificationNamed(KDERemoteConfigurationDidEndCycleNotification)
     }

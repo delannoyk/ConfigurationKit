@@ -8,12 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		4613B59F1A3E0FD2001DB168 /* KDEConfigurationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4613B5931A3E0FD2001DB168 /* KDEConfigurationKit.framework */; };
-		4613B5A61A3E0FD2001DB168 /* KDEConfigurationKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4613B5A51A3E0FD2001DB168 /* KDEConfigurationKitTests.swift */; };
 		4613B5BA1A3E15B5001DB168 /* KDERemoteConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4613B5B51A3E15B5001DB168 /* KDERemoteConfiguration.swift */; };
 		4613B5BC1A3E15B5001DB168 /* KDEURLBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4613B5B91A3E15B5001DB168 /* KDEURLBuilder.swift */; };
 		4613B5BE1A3E15E4001DB168 /* KDESimpleURLBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4613B5BD1A3E15E4001DB168 /* KDESimpleURLBuilder.swift */; };
 		4613B5C31A3E1F10001DB168 /* KDEFileDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4613B5C21A3E1F10001DB168 /* KDEFileDownloader.swift */; };
 		4613B5C61A3E1F85001DB168 /* KDERemoteConfigurationParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4613B5C51A3E1F85001DB168 /* KDERemoteConfigurationParser.swift */; };
+		461AADFB1A55D57A005183C5 /* KDESimpleURLBuilder_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461AADFA1A55D57A005183C5 /* KDESimpleURLBuilder_TestCase.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,13 +30,13 @@
 		4613B5931A3E0FD2001DB168 /* KDEConfigurationKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KDEConfigurationKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4613B59E1A3E0FD2001DB168 /* KDEConfigurationKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KDEConfigurationKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4613B5A41A3E0FD2001DB168 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4613B5A51A3E0FD2001DB168 /* KDEConfigurationKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KDEConfigurationKitTests.swift; sourceTree = "<group>"; };
 		4613B5B51A3E15B5001DB168 /* KDERemoteConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDERemoteConfiguration.swift; sourceTree = "<group>"; };
 		4613B5B71A3E15B5001DB168 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4613B5B91A3E15B5001DB168 /* KDEURLBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDEURLBuilder.swift; sourceTree = "<group>"; };
 		4613B5BD1A3E15E4001DB168 /* KDESimpleURLBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDESimpleURLBuilder.swift; sourceTree = "<group>"; };
 		4613B5C21A3E1F10001DB168 /* KDEFileDownloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDEFileDownloader.swift; sourceTree = "<group>"; };
 		4613B5C51A3E1F85001DB168 /* KDERemoteConfigurationParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDERemoteConfigurationParser.swift; sourceTree = "<group>"; };
+		461AADFA1A55D57A005183C5 /* KDESimpleURLBuilder_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDESimpleURLBuilder_TestCase.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,18 +91,18 @@
 		4613B5A21A3E0FD2001DB168 /* KDEConfigurationKitTests */ = {
 			isa = PBXGroup;
 			children = (
-				4613B5A51A3E0FD2001DB168 /* KDEConfigurationKitTests.swift */,
-				4613B5A31A3E0FD2001DB168 /* Supporting Files */,
+				461AADF51A55D509005183C5 /* tests */,
+				4613B5A31A3E0FD2001DB168 /* supporting_files */,
 			);
 			path = KDEConfigurationKitTests;
 			sourceTree = "<group>";
 		};
-		4613B5A31A3E0FD2001DB168 /* Supporting Files */ = {
+		4613B5A31A3E0FD2001DB168 /* supporting_files */ = {
 			isa = PBXGroup;
 			children = (
 				4613B5A41A3E0FD2001DB168 /* Info.plist */,
 			);
-			name = "Supporting Files";
+			path = supporting_files;
 			sourceTree = "<group>";
 		};
 		4613B5B41A3E15B5001DB168 /* configuration */ = {
@@ -142,6 +142,46 @@
 			isa = PBXGroup;
 			children = (
 				4613B5C51A3E1F85001DB168 /* KDERemoteConfigurationParser.swift */,
+			);
+			path = parser;
+			sourceTree = "<group>";
+		};
+		461AADF51A55D509005183C5 /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				461AADF71A55D52A005183C5 /* configuration */,
+				461AADF61A55D519005183C5 /* url_builder */,
+				461AADF81A55D538005183C5 /* downloader */,
+				461AADF91A55D542005183C5 /* parser */,
+			);
+			path = tests;
+			sourceTree = "<group>";
+		};
+		461AADF61A55D519005183C5 /* url_builder */ = {
+			isa = PBXGroup;
+			children = (
+				461AADFA1A55D57A005183C5 /* KDESimpleURLBuilder_TestCase.swift */,
+			);
+			path = url_builder;
+			sourceTree = "<group>";
+		};
+		461AADF71A55D52A005183C5 /* configuration */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = configuration;
+			sourceTree = "<group>";
+		};
+		461AADF81A55D538005183C5 /* downloader */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = downloader;
+			sourceTree = "<group>";
+		};
+		461AADF91A55D542005183C5 /* parser */ = {
+			isa = PBXGroup;
+			children = (
 			);
 			path = parser;
 			sourceTree = "<group>";
@@ -264,7 +304,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4613B5A61A3E0FD2001DB168 /* KDEConfigurationKitTests.swift in Sources */,
+				461AADFB1A55D57A005183C5 /* KDESimpleURLBuilder_TestCase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -314,7 +354,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -354,7 +394,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -374,7 +414,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "$(SRCROOT)/KDEConfigurationKit/supporting_files/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -392,7 +432,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "$(SRCROOT)/KDEConfigurationKit/supporting_files/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -402,6 +442,7 @@
 		4613B5AD1A3E0FD2001DB168 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -410,20 +451,22 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = KDEConfigurationKitTests/Info.plist;
+				INFOPLIST_FILE = KDEConfigurationKitTests/supporting_files/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		4613B5AE1A3E0FD2001DB168 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = KDEConfigurationKitTests/Info.plist;
+				INFOPLIST_FILE = KDEConfigurationKitTests/supporting_files/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
