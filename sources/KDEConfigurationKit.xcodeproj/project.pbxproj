@@ -14,6 +14,9 @@
 		4613B5C31A3E1F10001DB168 /* KDEFileDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4613B5C21A3E1F10001DB168 /* KDEFileDownloader.swift */; };
 		4613B5C61A3E1F85001DB168 /* KDERemoteConfigurationParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4613B5C51A3E1F85001DB168 /* KDERemoteConfigurationParser.swift */; };
 		461AADFB1A55D57A005183C5 /* KDESimpleURLBuilder_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461AADFA1A55D57A005183C5 /* KDESimpleURLBuilder_TestCase.swift */; };
+		46ABA7241AC7FE640073CBA4 /* KDERemoteConfiguration_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46ABA7231AC7FE640073CBA4 /* KDERemoteConfiguration_TestCase.swift */; };
+		46ABA7261AC7FED10073CBA4 /* KDERemoteConfigurationFlatJSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46ABA7251AC7FED10073CBA4 /* KDERemoteConfigurationFlatJSONParser.swift */; };
+		46C19CD31AC845AD0023537A /* KDERemoteConfigurationCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C19CD21AC845AD0023537A /* KDERemoteConfigurationCache.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +40,9 @@
 		4613B5C21A3E1F10001DB168 /* KDEFileDownloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDEFileDownloader.swift; sourceTree = "<group>"; };
 		4613B5C51A3E1F85001DB168 /* KDERemoteConfigurationParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDERemoteConfigurationParser.swift; sourceTree = "<group>"; };
 		461AADFA1A55D57A005183C5 /* KDESimpleURLBuilder_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDESimpleURLBuilder_TestCase.swift; sourceTree = "<group>"; };
+		46ABA7231AC7FE640073CBA4 /* KDERemoteConfiguration_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDERemoteConfiguration_TestCase.swift; sourceTree = "<group>"; };
+		46ABA7251AC7FED10073CBA4 /* KDERemoteConfigurationFlatJSONParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDERemoteConfigurationFlatJSONParser.swift; sourceTree = "<group>"; };
+		46C19CD21AC845AD0023537A /* KDERemoteConfigurationCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDERemoteConfigurationCache.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +85,7 @@
 		4613B5951A3E0FD2001DB168 /* KDEConfigurationKit */ = {
 			isa = PBXGroup;
 			children = (
+				46C19CD11AC8458D0023537A /* cache */,
 				4613B5B41A3E15B5001DB168 /* configuration */,
 				4613B5B81A3E15B5001DB168 /* url_builder */,
 				4613B5C11A3E1EBA001DB168 /* downloader */,
@@ -142,6 +149,7 @@
 			isa = PBXGroup;
 			children = (
 				4613B5C51A3E1F85001DB168 /* KDERemoteConfigurationParser.swift */,
+				46ABA7251AC7FED10073CBA4 /* KDERemoteConfigurationFlatJSONParser.swift */,
 			);
 			path = parser;
 			sourceTree = "<group>";
@@ -168,6 +176,7 @@
 		461AADF71A55D52A005183C5 /* configuration */ = {
 			isa = PBXGroup;
 			children = (
+				46ABA7231AC7FE640073CBA4 /* KDERemoteConfiguration_TestCase.swift */,
 			);
 			path = configuration;
 			sourceTree = "<group>";
@@ -184,6 +193,14 @@
 			children = (
 			);
 			path = parser;
+			sourceTree = "<group>";
+		};
+		46C19CD11AC8458D0023537A /* cache */ = {
+			isa = PBXGroup;
+			children = (
+				46C19CD21AC845AD0023537A /* KDERemoteConfigurationCache.swift */,
+			);
+			path = cache;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -297,6 +314,8 @@
 				4613B5C31A3E1F10001DB168 /* KDEFileDownloader.swift in Sources */,
 				4613B5BA1A3E15B5001DB168 /* KDERemoteConfiguration.swift in Sources */,
 				4613B5BE1A3E15E4001DB168 /* KDESimpleURLBuilder.swift in Sources */,
+				46ABA7261AC7FED10073CBA4 /* KDERemoteConfigurationFlatJSONParser.swift in Sources */,
+				46C19CD31AC845AD0023537A /* KDERemoteConfigurationCache.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,6 +324,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				461AADFB1A55D57A005183C5 /* KDESimpleURLBuilder_TestCase.swift in Sources */,
+				46ABA7241AC7FE640073CBA4 /* KDERemoteConfiguration_TestCase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

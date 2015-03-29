@@ -10,37 +10,28 @@ import UIKit
 
 private let kKDEFileDownloaderDefaultRefreshInterval = NSTimeInterval(2 * 60 * 60)
 
-internal typealias KDEFileDownloaderBeginBlock = () -> NSURLRequest
-internal typealias KDEFileDownloaderCompletion = (NSData?, NSHTTPURLResponse?, NSError?) -> Void
-
 internal class KDEFileDownloader: NSObject {
+    private let lock = NSLock()
+    private let dispatchQueue = dispatch_queue_create("kde_file_downloader", nil)
+
     private var timer: NSTimer?
     private var hasStart = false
-    private var lock = NSLock()
-    private var dispatchQueue = dispatch_queue_create("kde_file_downloader", 0)
 
-    // MARK: - Configuration
+    internal typealias KDEFileDownloaderOnBegin = () -> NSURLRequest?
+    internal typealias KDEFileDownloaderOnCompletion = (NSData?, NSHTTPURLResponse?, NSError?) -> Void
+
+    // MARK: Configuration
     ////////////////////////////////////////////////////////////////////////////
 
-    var refreshWhenEnteringForeground: Bool = false {
+    var refreshWhenEnteringForeground = false {
         didSet {
             if oldValue != self.refreshWhenEnteringForeground {
-                if self.refreshWhenEnteringForeground {
-                    NSNotificationCenter.defaultCenter().addObserver(self,
-                        selector: "appWillEnterForeground:",
-                        name: UIApplicationWillEnterForegroundNotification,
-                        object: nil)
-                }
-                else {
-                    NSNotificationCenter.defaultCenter().removeObserver(self,
-                        name: UIApplicationWillEnterForegroundNotification,
-                        object: nil)
-                }
+                self.didUpdateRefreshWhenEnteringForeground()
             }
         }
     }
 
-    var refreshOnIntervalBasis: Bool = false {
+    var refreshOnIntervalBasis = false {
         didSet {
             if oldValue != self.refreshOnIntervalBasis {
                 self.createTimerIfNecessary()
@@ -48,38 +39,61 @@ internal class KDEFileDownloader: NSObject {
         }
     }
 
-    var refreshInterval: NSTimeInterval {
+    var refreshInterval = kKDEFileDownloaderDefaultRefreshInterval {
         didSet {
             if self.refreshOnIntervalBasis {
-                self.refreshOnIntervalBasis = false
-                self.refreshOnIntervalBasis = true
+                self.createTimerIfNecessary()
             }
         }
     }
-    
-    var beginBlock: KDEFileDownloaderBeginBlock
-    var completionBlock: KDEFileDownloaderCompletion? = nil
+
+    var onRefreshBegin: KDEFileDownloaderOnBegin
+
+    var onRefreshComplete: KDEFileDownloaderOnCompletion? = nil
 
     ////////////////////////////////////////////////////////////////////////////
 
 
-    // MARK: - Initialization
+    // MARK: Initialization
     ////////////////////////////////////////////////////////////////////////////
 
     init(refreshWhenEnteringForeground: Bool = true, refreshOnIntervalBasis: Bool = true,
         refreshInterval: NSTimeInterval = kKDEFileDownloaderDefaultRefreshInterval,
-        beginBlock: KDEFileDownloaderBeginBlock) {
+        beginBlock: KDEFileDownloaderOnBegin) {
             self.refreshWhenEnteringForeground = refreshWhenEnteringForeground
             self.refreshOnIntervalBasis = refreshOnIntervalBasis
             self.refreshInterval = refreshInterval
-            self.beginBlock = beginBlock
+            self.onRefreshBegin = beginBlock
             super.init()
+
+            self.didUpdateRefreshWhenEnteringForeground()
+            self.createTimerIfNecessary()
     }
 
     ////////////////////////////////////////////////////////////////////////////
 
 
-    // MARK: - Start/Stop
+    // MARK: State update
+    ////////////////////////////////////////////////////////////////////////////
+
+    private func didUpdateRefreshWhenEnteringForeground() {
+        if self.refreshWhenEnteringForeground {
+            NSNotificationCenter.defaultCenter().addObserver(self,
+                selector: "appWillEnterForeground:",
+                name: UIApplicationWillEnterForegroundNotification,
+                object: nil)
+        }
+        else {
+            NSNotificationCenter.defaultCenter().removeObserver(self,
+                name: UIApplicationWillEnterForegroundNotification,
+                object: nil)
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+
+    // MARK: Start/Stop
     ////////////////////////////////////////////////////////////////////////////
 
     func start() {
@@ -100,10 +114,10 @@ internal class KDEFileDownloader: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
 
-    // MARK: - Refresh invocators
+    // MARK: Refresh invocators
     ////////////////////////////////////////////////////////////////////////////
 
-    func timerTicker(NSTimer) {
+    func timerTicked(NSTimer) {
         self.refresh()
     }
 
@@ -116,50 +130,45 @@ internal class KDEFileDownloader: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
 
-    // MARK: - Refresh
+    // MARK: Refresh
     ////////////////////////////////////////////////////////////////////////////
 
     private func refresh() {
         //If tryLock fails that means a refresh is already being performed
         if self.lock.tryLock() {
             dispatch_async(self.dispatchQueue, { () -> Void in
-                var request = self.beginBlock()
+                if let URLRequest = self.onRefreshBegin() {
+                    //Getting the data
+                    let dataTask = NSURLSession.sharedSession().dataTaskWithRequest(URLRequest,
+                        completionHandler: {[weak self] (data, response, error) -> Void in
+                            //Calling completion
+                            self?.onRefreshComplete?(data, response as? NSHTTPURLResponse, error)
 
-                //Getting the data
-                var error: NSError? = nil
-                var response: NSURLResponse? = nil
-                var data = NSURLConnection.sendSynchronousRequest(request,
-                    returningResponse: &response,
-                    error: &error)
-
-                //Calling completion
-                if let completionBlock = self.completionBlock {
-                    completionBlock(data, response as? NSHTTPURLResponse, error)
+                            //Planning next cycle
+                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                                self?.createTimerIfNecessary()
+                                self?.lock.unlock()
+                            })
+                        })
+                    dataTask.resume()
                 }
-
-                //Planning next cycle
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    self.createTimerIfNecessary()
-                    self.lock.unlock()
-                })
+                else {
+                    self.stop()
+                }
             })
-        }
-        else {
-            //TODO:
-            // We will only take care of this situation if last refresh failed
         }
     }
 
     ////////////////////////////////////////////////////////////////////////////
 
 
-    // MARK: - Timer
+    // MARK: Timer
     ////////////////////////////////////////////////////////////////////////////
 
     private func createTimerIfNecessary() {
         self.invalidateTimer()
 
-        if refreshOnIntervalBasis && self.hasStart {
+        if self.refreshOnIntervalBasis && self.hasStart {
             self.timer = NSTimer.scheduledTimerWithTimeInterval(self.refreshInterval,
                 target: self,
                 selector: "timerTicked:",

@@ -9,9 +9,9 @@
 import UIKit
 
 public class KDESimpleURLBuilder: NSObject, KDEURLBuilder {
-    private var _URLRequest: NSURLRequest
+    private let _URLRequest: NSURLRequest
 
-    // MARK: - Initialization
+    // MARK: Initialization
     ////////////////////////////////////////////////////////////////////////////
 
     public convenience init(URL: NSURL) {
@@ -26,7 +26,7 @@ public class KDESimpleURLBuilder: NSObject, KDEURLBuilder {
     ////////////////////////////////////////////////////////////////////////////
 
 
-    // MARK: - KDEConfigurationURLBuilder
+    // MARK: KDEConfigurationURLBuilder
     ////////////////////////////////////////////////////////////////////////////
 
     public func URLRequest() -> NSURLRequest {

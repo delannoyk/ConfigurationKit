@@ -8,34 +8,45 @@
 
 import UIKit
 
-let KDERemoteConfigurationWillStartNewCycleNotification = "KDERemoteConfigurationWillStartNewCycleNotification"
-let KDERemoteConfigurationDidEndCycleNotification = "KDERemoteConfigurationDidEndCycleNotification"
+// MARK: - Notification
+////////////////////////////////////////////////////////////////////////////
 
-let KDERemoteConfigurationNewKeyDetectedNotification = "KDERemoteConfigurationNewKeyDetectedNotification"
-let KDERemoteConfigurationValueChangedNotification = "KDERemoteConfigurationValueChangedNotification"
-let KDERemoteConfigurationKeyRemovalDetectedNotification = "KDERemoteConfigurationKeyRemovalDetectedNotification"
+public let KDERemoteConfigurationWillStartNewCycleNotification = "KDERemoteConfigurationWillStartNewCycleNotification"
+public let KDERemoteConfigurationDidEndCycleNotification = "KDERemoteConfigurationDidEndCycleNotification"
 
-let KDERemoteConfigurationKeyKey = "KDERemoteConfigurationKeyKey"
-let KDERemoteConfigurationNewValueKey = "KDERemoteConfigurationNewValueKey"
-let KDERemoteConfigurationOldValueKey = "KDERemoteConfigurationOldValueKey"
+public let KDERemoteConfigurationNewKeyDetectedNotification = "KDERemoteConfigurationNewKeyDetectedNotification"
+public let KDERemoteConfigurationValueChangedNotification = "KDERemoteConfigurationValueChangedNotification"
+public let KDERemoteConfigurationKeyRemovalDetectedNotification = "KDERemoteConfigurationKeyRemovalDetectedNotification"
+
+public let KDERemoteConfigurationKeyKey = "KDERemoteConfigurationKeyKey"
+public let KDERemoteConfigurationNewValueKey = "KDERemoteConfigurationNewValueKey"
+public let KDERemoteConfigurationOldValueKey = "KDERemoteConfigurationOldValueKey"
+
+////////////////////////////////////////////////////////////////////////////
+
+
+// MARK: - RemoteConfiguration
+////////////////////////////////////////////////////////////////////////////
 
 public class KDERemoteConfiguration: NSObject {
-    private var URLBuilder: KDEURLBuilder
-    private var parser: KDERemoteConfigurationParser
-
-    private lazy var fileDownloader: KDEFileDownloader = {
-        var downloader = KDEFileDownloader(beginBlock: self.fileDownloaderWillStart)
-        downloader.completionBlock = self.fileDownloaderCompletedWithData
-        return downloader
-    }()
-
-    private(set) var configurationDate: NSDate?
-    private(set) var lastCycleDate: NSDate?
-    private(set) var lastCycleError: NSError?
+    private let URLBuilder: KDEURLBuilder
+    private let parser: KDERemoteConfigurationParser
 
     private var configuration: [String: String]
 
-    // MARK: - Initialization & Deinitialization
+    private lazy var fileDownloader: KDEFileDownloader = {
+        let downloader = KDEFileDownloader(beginBlock: {[weak self] () -> NSURLRequest? in
+            return self?.fileDownloaderWillStart()
+        })
+        downloader.onRefreshComplete = {[weak self] (data, response, error) -> Void in
+            self?.fileDownloaderCompletedWithData(data, response: response, error: error)
+            return
+        }
+        return downloader
+    }()
+
+
+    // MARK: Initialization & Deinitialization
     ////////////////////////////////////////////////////////////////////////////
 
     public convenience init(URL: NSURL, parser: KDERemoteConfigurationParser) {
@@ -63,7 +74,7 @@ public class KDERemoteConfiguration: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
 
-    // MARK: - Subscript & Object for key
+    // MARK: Subscript & Object for key
     ////////////////////////////////////////////////////////////////////////////
 
     public subscript(key: String) -> String? {
@@ -81,7 +92,21 @@ public class KDERemoteConfiguration: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
 
-    // MARK: - KDEFileDownloader handler
+    // MARK: Properties
+    ////////////////////////////////////////////////////////////////////////////
+
+    public private(set) var configurationDate: NSDate?
+
+    public private(set) var lastCycleDate: NSDate?
+
+    public private(set) var lastCycleError: NSError?
+
+    public var shouldCacheData = true
+
+    ////////////////////////////////////////////////////////////////////////////
+
+
+    // MARK: KDEFileDownloader handler
     ////////////////////////////////////////////////////////////////////////////
 
     private func fileDownloaderWillStart() -> NSURLRequest {
@@ -91,65 +116,54 @@ public class KDERemoteConfiguration: NSObject {
 
     private func fileDownloaderCompletedWithData(data: NSData?, response: NSHTTPURLResponse?, error: NSError?) {
         if let data = data {
-            //1. Parsing
-            var parsingResult = self.parser.parseData(data)
-            if let configuration = parsingResult.configuration {
-                //2. Analyzing changes & new values
+            //Parsing data
+            let result = self.parser.parseData(data)
+            if let configuration = result.result {
+                //Analyzing key changes & new value
                 for (key, value) in configuration {
-                    var existingValue = self[key]
-                    self.configuration[key] = value
-
-                    if let existingValue = existingValue {
-                        if existingValue != value {
-                            self.postNotificationNamed(KDERemoteConfigurationValueChangedNotification,
-                                userInfo: [
-                                    KDERemoteConfigurationKeyKey: key,
-                                    KDERemoteConfigurationOldValueKey: existingValue,
-                                    KDERemoteConfigurationNewValueKey: value
+                    if let existing = self[key] {
+                        if existing != value {
+                            self.postNotificationNamed(KDERemoteConfigurationValueChangedNotification, userInfo: [
+                                KDERemoteConfigurationKeyKey: key,
+                                KDERemoteConfigurationOldValueKey: existing,
+                                KDERemoteConfigurationNewValueKey: value
                                 ])
                         }
                     }
                     else {
-                        self.postNotificationNamed(KDERemoteConfigurationNewKeyDetectedNotification,
-                            userInfo: [
-                                KDERemoteConfigurationKeyKey: key,
-                                KDERemoteConfigurationNewValueKey: value
+                        self.postNotificationNamed(KDERemoteConfigurationNewKeyDetectedNotification, userInfo: [
+                            KDERemoteConfigurationKeyKey: key,
+                            KDERemoteConfigurationNewValueKey: value
                             ])
                     }
                 }
 
-                //3. Analyzing removal
-                var newKeys = configuration.keys.array
-                var removedKeys = self.configuration.keys.array.filter({element in
-                    return !contains(newKeys, element)
+                //Analyzing key removal
+                let newConfigurationKeys = configuration.keys.array
+                let removed = filter(self.configuration.keys.array, { element in
+                    if !contains(newConfigurationKeys, element) {
+                        self.postNotificationNamed(KDERemoteConfigurationKeyRemovalDetectedNotification, userInfo: [
+                            KDERemoteConfigurationKeyKey: element,
+                            KDERemoteConfigurationOldValueKey: self[element] ?? ""
+                            ])
+                        return true
+                    }
+                    return false
                 })
-                for key in removedKeys {
-                    if let value = self.configuration[key] {
-                        self.configuration.removeValueForKey(key)
 
-                        self.postNotificationNamed(KDERemoteConfigurationKeyRemovalDetectedNotification,
-                            userInfo: [
-                                KDERemoteConfigurationKeyKey: key,
-                                KDERemoteConfigurationOldValueKey: value
-                            ])
-                    }
-                    //The else case should not happen anytime
-                }
-
-                //4. Caching
+                //Caching & saving date
                 self.configuration = configuration
-
-                //5. Saving last cycle date
                 self.configurationDate = NSDate()
             }
             else {
-                self.lastCycleError = parsingResult.error
+                self.lastCycleError = result.error
             }
         }
         else {
             self.lastCycleError = error
         }
 
+        //Saving date
         self.lastCycleDate = NSDate()
         self.postNotificationNamed(KDERemoteConfigurationDidEndCycleNotification)
     }
@@ -157,15 +171,31 @@ public class KDERemoteConfiguration: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
 
-    // MARK: - Notification
+    // MARK: Notification
     ////////////////////////////////////////////////////////////////////////////
 
     private func postNotificationNamed(name: String, userInfo: [NSObject: AnyObject]? = nil) {
-        dispatch_sync(dispatch_get_main_queue(), { () -> Void in
+        dispatch_sync(dispatch_get_main_queue(), {[weak self] () -> Void in
             var note = NSNotification(name: name, object: self, userInfo: userInfo)
             NSNotificationCenter.defaultCenter().postNotification(note)
         })
     }
 
     ////////////////////////////////////////////////////////////////////////////
+
+
+    // MARK: Description
+    ////////////////////////////////////////////////////////////////////////////
+
+    override public var description: String {
+        return self.configuration.description
+    }
+
+    override public var debugDescription: String {
+        return self.configuration.debugDescription
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
 }
+
+////////////////////////////////////////////////////////////////////////////
