@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class KDESimpleURLBuilder: NSObject, KDEURLBuilder {
+public final class KDESimpleURLBuilder: NSObject, KDEURLBuilder {
     private let _URLRequest: NSURLRequest
 
     // MARK: Initialization

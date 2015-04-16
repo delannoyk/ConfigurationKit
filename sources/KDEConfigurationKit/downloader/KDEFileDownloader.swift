@@ -10,7 +10,7 @@ import UIKit
 
 private let kKDEFileDownloaderDefaultRefreshInterval = NSTimeInterval(2 * 60 * 60)
 
-internal class KDEFileDownloader: NSObject {
+internal final class KDEFileDownloader: NSObject {
     private let lock = NSLock()
     private let dispatchQueue = dispatch_queue_create("kde_file_downloader", nil)
 

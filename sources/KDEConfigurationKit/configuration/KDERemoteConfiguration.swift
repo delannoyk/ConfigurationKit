@@ -28,7 +28,7 @@ public let KDERemoteConfigurationOldValueKey = "KDERemoteConfigurationOldValueKe
 // MARK: - RemoteConfiguration
 ////////////////////////////////////////////////////////////////////////////
 
-public class KDERemoteConfiguration: NSObject {
+public final class KDERemoteConfiguration: NSObject {
     private let URLBuilder: KDEURLBuilder
     private let parser: KDERemoteConfigurationParser
 
@@ -102,6 +102,33 @@ public class KDERemoteConfiguration: NSObject {
     public private(set) var lastCycleError: NSError?
 
     public var shouldCacheData = true
+
+    public var refreshWhenEnteringForeground: Bool {
+        get {
+            return self.fileDownloader.refreshWhenEnteringForeground
+        }
+        set {
+            self.fileDownloader.refreshWhenEnteringForeground = newValue
+        }
+    }
+
+    public var refreshOnIntervalBasis: Bool {
+        get {
+            return self.fileDownloader.refreshOnIntervalBasis
+        }
+        set {
+            self.fileDownloader.refreshOnIntervalBasis = newValue
+        }
+    }
+
+    public var refreshInterval: NSTimeInterval {
+        get {
+            return self.fileDownloader.refreshInterval
+        }
+        set {
+            self.fileDownloader.refreshInterval = newValue
+        }
+    }
 
     ////////////////////////////////////////////////////////////////////////////
 

@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class KDERemoteConfigurationFlatJSONParser: NSObject, KDERemoteConfigurationParser {
+public final class KDERemoteConfigurationFlatJSONParser: NSObject, KDERemoteConfigurationParser {
     public func parseData(data: NSData) -> KDEResult<[String: String]> {
         var error: NSError? = nil
         if let JSONObject = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error) as? [String: String] {

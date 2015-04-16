@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class KDEBox<T> {
+public final class KDEBox<T> {
     public let value: T
 
     internal init(_ value: T) {
