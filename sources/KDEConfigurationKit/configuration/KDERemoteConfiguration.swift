@@ -31,8 +31,9 @@ public let KDERemoteConfigurationOldValueKey = "KDERemoteConfigurationOldValueKe
 public final class KDERemoteConfiguration: NSObject {
     private let URLBuilder: KDEURLBuilder
     private let parser: KDERemoteConfigurationParser
+    private let cache: KDERemoteConfigurationCache
 
-    private var configuration: [String: String]
+    internal private(set) var configuration: [String: String]
 
     private lazy var fileDownloader: KDEFileDownloader = {
         let downloader = KDEFileDownloader(beginBlock: {[weak self] () -> NSURLRequest? in
@@ -49,19 +50,22 @@ public final class KDERemoteConfiguration: NSObject {
     // MARK: Initialization & Deinitialization
     ////////////////////////////////////////////////////////////////////////////
 
-    public convenience init(URL: NSURL, parser: KDERemoteConfigurationParser) {
-        self.init(URLRequest: NSURLRequest(URL: URL), parser: parser)
+    public convenience init(URL: NSURL, parser: KDERemoteConfigurationParser, cache: KDERemoteConfigurationCache) {
+        self.init(URLRequest: NSURLRequest(URL: URL), parser: parser, cache: cache)
     }
 
-    public convenience init(URLRequest: NSURLRequest, parser: KDERemoteConfigurationParser) {
-        self.init(URLBuilder: KDESimpleURLBuilder(URLRequest: URLRequest), parser: parser)
+    public convenience init(URLRequest: NSURLRequest, parser: KDERemoteConfigurationParser, cache: KDERemoteConfigurationCache) {
+        self.init(URLBuilder: KDESimpleURLBuilder(URLRequest: URLRequest), parser: parser, cache: cache)
     }
 
-    public init(URLBuilder: KDEURLBuilder, parser: KDERemoteConfigurationParser) {
+    public init(URLBuilder: KDEURLBuilder, parser: KDERemoteConfigurationParser, cache: KDERemoteConfigurationCache) {
         self.URLBuilder = URLBuilder
         self.parser = parser
+        self.cache = cache
         self.configuration = [:]
         super.init()
+
+        self.setCachedProperties()
 
         self.fileDownloader.start()
     }
@@ -69,6 +73,16 @@ public final class KDERemoteConfiguration: NSObject {
 
     deinit {
         self.fileDownloader.stop()
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+
+    // MARK: Caching
+    ////////////////////////////////////////////////////////////////////////////
+
+    private func setCachedProperties() {
+        
     }
 
     ////////////////////////////////////////////////////////////////////////////
