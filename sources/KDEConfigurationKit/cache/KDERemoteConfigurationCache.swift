@@ -10,19 +10,19 @@ import UIKit
 
 public final class KDERemoteConfigurationCache: NSObject {
     private let cachePath: String
-    private let encryptCache: Bool
+    private let encryptor: KDERemoteConfigurationCacheEncryptor?
 
     // MARK: Initialization
     ////////////////////////////////////////////////////////////////////////////
 
-    public init(identifier: String, encryptCache: Bool) {
+    public init(identifier: String, encryptor: KDERemoteConfigurationCacheEncryptor? = nil) {
         let configurationDirectory = String.documentPath.stringByAppendingPathComponent("ConfigurationKit")
         configurationDirectory.createDirectoryIfNecesserary()
 
         self.cachePath = configurationDirectory.stringByAppendingPathComponent("\(identifier).rconf")
         self.cachePath.createDirectoryIfNecesserary()
 
-        self.encryptCache = encryptCache
+        self.encryptor = encryptor
         super.init()
     }
 
@@ -32,14 +32,30 @@ public final class KDERemoteConfigurationCache: NSObject {
     // MARK: Caching
     ////////////////////////////////////////////////////////////////////////////
 
-    internal func cacheData(data: NSData, inFile file: String) {
-        //TODO: encryptCache?
-        data.writeToFile(self.cachePath.stringByAppendingPathComponent(file), atomically: true)
+    internal func cacheData(data: NSData?, inFile file: String) {
+        let path = self.cachePath.stringByAppendingPathComponent(file)
+        if let data = data {
+            let toWrite: NSData = {
+                if let encryptor = self.encryptor {
+                    return encryptor.encryptedData(fromData: data)
+                }
+                return data
+            }()
+            toWrite.writeToFile(path, atomically: true)
+        }
+        else {
+            NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
+        }
     }
 
     internal func cachedData(inFile file: String) -> NSData? {
-        //TODO: encryptCache?
-        return NSData(contentsOfFile: self.cachePath.stringByAppendingPathComponent(file))
+        if let data = NSData(contentsOfFile: self.cachePath.stringByAppendingPathComponent(file)) {
+            if let encryptor = self.encryptor {
+                return encryptor.decryptedData(fromData: data)
+            }
+            return data
+        }
+        return nil
     }
 
     ////////////////////////////////////////////////////////////////////////////

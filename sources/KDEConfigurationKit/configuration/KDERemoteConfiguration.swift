@@ -25,6 +25,17 @@ public let KDERemoteConfigurationOldValueKey = "KDERemoteConfigurationOldValueKe
 ////////////////////////////////////////////////////////////////////////////
 
 
+// MARK: - Cache keys
+////////////////////////////////////////////////////////////////////////////
+
+private let KDERemoteConfigurationConfigurationKey = "configuration.conf"
+private let KDERemoteConfigurationDateKey = "configuration.date"
+private let KDERemoteConfigurationLastCycleDateKey = "cycle.date"
+private let KDERemoteConfigurationLastCycleErrorKey = "cycle.error"
+
+////////////////////////////////////////////////////////////////////////////
+
+
 // MARK: - RemoteConfiguration
 ////////////////////////////////////////////////////////////////////////////
 
@@ -82,6 +93,34 @@ public final class KDERemoteConfiguration: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
     private func setCachedProperties() {
+        if let data = self.cache.cachedData(inFile: KDERemoteConfigurationConfigurationKey), configuration = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? [String: String] {
+            self.configuration = configuration
+        }
+        else {
+            //TODO: load bootstrap
+        }
+
+        if let data = self.cache.cachedData(inFile: KDERemoteConfigurationDateKey), date = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? NSDate {
+            self.configurationDate = date
+        }
+        else {
+            //TODO: bootstrap?
+        }
+
+        if let data = self.cache.cachedData(inFile: KDERemoteConfigurationLastCycleDateKey), date = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? NSDate {
+            self.lastCycleDate = date
+        }
+
+        if let data = self.cache.cachedData(inFile: KDERemoteConfigurationLastCycleErrorKey), error = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? NSError {
+            self.lastCycleError = error
+        }
+    }
+
+    private func cacheConfigurationInfo(#config: Bool, date: Bool) {
+
+    }
+
+    private func cacheCycleInfo() {
         
     }
 
@@ -160,22 +199,28 @@ public final class KDERemoteConfiguration: NSObject {
             //Parsing data
             let result = self.parser.parseData(data)
             if let configuration = result.result {
+                var hasChanges = false
+
                 //Analyzing key changes & new value
                 for (key, value) in configuration {
                     if let existing = self[key] {
                         if existing != value {
+                            hasChanges = true
+
                             self.postNotificationNamed(KDERemoteConfigurationValueChangedNotification, userInfo: [
                                 KDERemoteConfigurationKeyKey: key,
                                 KDERemoteConfigurationOldValueKey: existing,
                                 KDERemoteConfigurationNewValueKey: value
-                                ])
+                            ])
                         }
                     }
                     else {
+                        hasChanges = true
+
                         self.postNotificationNamed(KDERemoteConfigurationNewKeyDetectedNotification, userInfo: [
                             KDERemoteConfigurationKeyKey: key,
                             KDERemoteConfigurationNewValueKey: value
-                            ])
+                        ])
                     }
                 }
 
@@ -183,10 +228,12 @@ public final class KDERemoteConfiguration: NSObject {
                 let newConfigurationKeys = configuration.keys.array
                 let removed = filter(self.configuration.keys.array, { element in
                     if !contains(newConfigurationKeys, element) {
+                        hasChanges = true
+
                         self.postNotificationNamed(KDERemoteConfigurationKeyRemovalDetectedNotification, userInfo: [
                             KDERemoteConfigurationKeyKey: element,
                             KDERemoteConfigurationOldValueKey: self[element] ?? ""
-                            ])
+                        ])
                         return true
                     }
                     return false
@@ -195,6 +242,8 @@ public final class KDERemoteConfiguration: NSObject {
                 //Caching & saving date
                 self.configuration = configuration
                 self.configurationDate = NSDate()
+                self.lastCycleError = nil
+                self.cacheConfigurationInfo(config: hasChanges, date: true)
             }
             else {
                 self.lastCycleError = result.error
@@ -206,6 +255,7 @@ public final class KDERemoteConfiguration: NSObject {
 
         //Saving date
         self.lastCycleDate = NSDate()
+        self.cacheCycleInfo()
         self.postNotificationNamed(KDERemoteConfigurationDidEndCycleNotification)
     }
 

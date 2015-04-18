@@ -15,7 +15,7 @@ class KDERemoteConfiguration_TestCase: XCTestCase {
         let URL = NSURL(string: "https://raw.githubusercontent.com/delannoyk/KDEConfigurationKit/master/SampleConfig.json")!
 
         let URLBuilder = KDESimpleURLBuilder(URL: URL)
-        let configuration = KDERemoteConfiguration(URLBuilder: URLBuilder, parser: KDERemoteConfigurationFlatJSONParser(), cache: KDERemoteConfigurationCache(identifier: "123", encryptCache: true))
+        let configuration = KDERemoteConfiguration(URLBuilder: URLBuilder, parser: KDERemoteConfigurationFlatJSONParser(), cache: KDERemoteConfigurationCache(identifier: "123", encryptor: nil))
 
         let expectation = self.expectationWithDescription("Waiting for cycle completed notification")
 

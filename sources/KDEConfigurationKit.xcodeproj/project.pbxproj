@@ -17,6 +17,7 @@
 		4698756C1AE1768700A0AB37 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4698756B1AE1768700A0AB37 /* StringExtension.swift */; };
 		46ABA7241AC7FE640073CBA4 /* KDERemoteConfiguration_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46ABA7231AC7FE640073CBA4 /* KDERemoteConfiguration_TestCase.swift */; };
 		46ABA7261AC7FED10073CBA4 /* KDERemoteConfigurationFlatJSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46ABA7251AC7FED10073CBA4 /* KDERemoteConfigurationFlatJSONParser.swift */; };
+		46B121131AE23EEA003E0BD8 /* KDERemoteConfigurationCacheEncryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B121121AE23EEA003E0BD8 /* KDERemoteConfigurationCacheEncryptor.swift */; };
 		46C19CD31AC845AD0023537A /* KDERemoteConfigurationCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C19CD21AC845AD0023537A /* KDERemoteConfigurationCache.swift */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +45,7 @@
 		4698756B1AE1768700A0AB37 /* StringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		46ABA7231AC7FE640073CBA4 /* KDERemoteConfiguration_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDERemoteConfiguration_TestCase.swift; sourceTree = "<group>"; };
 		46ABA7251AC7FED10073CBA4 /* KDERemoteConfigurationFlatJSONParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDERemoteConfigurationFlatJSONParser.swift; sourceTree = "<group>"; };
+		46B121121AE23EEA003E0BD8 /* KDERemoteConfigurationCacheEncryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDERemoteConfigurationCacheEncryptor.swift; sourceTree = "<group>"; };
 		46C19CD21AC845AD0023537A /* KDERemoteConfigurationCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDERemoteConfigurationCache.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -210,6 +212,7 @@
 			isa = PBXGroup;
 			children = (
 				46C19CD21AC845AD0023537A /* KDERemoteConfigurationCache.swift */,
+				46B121121AE23EEA003E0BD8 /* KDERemoteConfigurationCacheEncryptor.swift */,
 			);
 			path = cache;
 			sourceTree = "<group>";
@@ -322,6 +325,7 @@
 			files = (
 				4613B5BC1A3E15B5001DB168 /* KDEURLBuilder.swift in Sources */,
 				4613B5C61A3E1F85001DB168 /* KDERemoteConfigurationParser.swift in Sources */,
+				46B121131AE23EEA003E0BD8 /* KDERemoteConfigurationCacheEncryptor.swift in Sources */,
 				4613B5C31A3E1F10001DB168 /* KDEFileDownloader.swift in Sources */,
 				4613B5BA1A3E15B5001DB168 /* KDERemoteConfiguration.swift in Sources */,
 				4698756C1AE1768700A0AB37 /* StringExtension.swift in Sources */,
