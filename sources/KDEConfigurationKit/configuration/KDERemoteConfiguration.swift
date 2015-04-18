@@ -117,11 +117,27 @@ public final class KDERemoteConfiguration: NSObject {
     }
 
     private func cacheConfigurationInfo(#config: Bool, date: Bool) {
-
+        if config {
+            self.cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(self.configuration), inFile: KDERemoteConfigurationConfigurationKey)
+        }
+        if date {
+            if let configurationDate = self.configurationDate {
+                self.cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(configurationDate), inFile: KDERemoteConfigurationDateKey)
+            }
+        }
     }
 
     private func cacheCycleInfo() {
-        
+        if let lastCycleDate = self.lastCycleDate {
+            self.cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(lastCycleDate), inFile: KDERemoteConfigurationLastCycleDateKey)
+        }
+
+        if let lastCycleError = self.lastCycleError {
+            self.cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(lastCycleError), inFile: KDERemoteConfigurationLastCycleErrorKey)
+        }
+        else {
+            self.cache.cacheData(nil, inFile: KDERemoteConfigurationLastCycleErrorKey)
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////
