@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'ConfigurationKit'
-  s.version      = '0.1.1'
+  s.version      = '0.1.2'
   s.license      =  { :type => 'MIT' }
   s.homepage     = 'https://github.com/delannoyk/ConfigurationKit'
   s.authors      = {
@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
     :git => 'https://github.com/delannoyk/ConfigurationKit.git',
     :tag => s.version.to_s
   }
-  s.source_files = 'sources/**/*.swift'
+  s.source_files = 'sources/ConfigurationKit/**/*.swift'
   s.framework    =  'UIKit'
 
   s.requires_arc = true
