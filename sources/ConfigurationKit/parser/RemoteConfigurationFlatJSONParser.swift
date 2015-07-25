@@ -8,12 +8,15 @@
 
 import UIKit
 
-public final class RemoteConfigurationFlatJSONParser: NSObject, RemoteConfigurationParser {
+public struct RemoteConfigurationFlatJSONParser: RemoteConfigurationParser {
+    public init() {
+    }
+
     public func parseData(data: NSData) -> Result<[String: String]> {
         var error: NSError? = nil
         if let JSONObject = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error) as? [String: String] {
             return .Success(Box(JSONObject))
         }
-        return .Failure(error ?? NSError(domain: "RemoteConfigurationFlatJSONParser", code: 0, userInfo: nil))
+        return .Failure(error ?? NSError(domain: "\(RemoteConfigurationFlatJSONParser.self)", code: 0, userInfo: nil))
     }
 }
