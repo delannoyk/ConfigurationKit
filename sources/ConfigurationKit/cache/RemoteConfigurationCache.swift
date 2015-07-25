@@ -8,22 +8,24 @@
 
 import UIKit
 
-public final class RemoteConfigurationCache: NSObject {
+public struct RemoteConfigurationCache {
     private let cachePath: String
+    private let bootstrapConfigurationFilePath: String?
     private let encryptor: RemoteConfigurationCacheEncryptor?
 
     // MARK: Initialization
     ////////////////////////////////////////////////////////////////////////////
 
-    public init(identifier: String, encryptor: RemoteConfigurationCacheEncryptor? = nil) {
+    public init(identifier: String, bootstrapConfigurationFilePath: String? = nil, encryptor: RemoteConfigurationCacheEncryptor? = nil) {
         let configurationDirectory = String.documentPath.stringByAppendingPathComponent("ConfigurationKit")
         configurationDirectory.createDirectoryIfNecesserary()
 
-        self.cachePath = configurationDirectory.stringByAppendingPathComponent("\(identifier).rconf")
-        self.cachePath.createDirectoryIfNecesserary()
+        cachePath = configurationDirectory.stringByAppendingPathComponent("\(identifier).rconf")
+        cachePath.createDirectoryIfNecesserary()
+
+        self.bootstrapConfigurationFilePath = bootstrapConfigurationFilePath
 
         self.encryptor = encryptor
-        super.init()
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -33,7 +35,7 @@ public final class RemoteConfigurationCache: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
     internal func cacheData(data: NSData?, inFile file: String) {
-        let path = self.cachePath.stringByAppendingPathComponent(file)
+        let path = cachePath.stringByAppendingPathComponent(file)
         if let data = data {
             let toWrite: NSData = {
                 if let encryptor = self.encryptor {
@@ -49,11 +51,24 @@ public final class RemoteConfigurationCache: NSObject {
     }
 
     internal func cachedData(inFile file: String) -> NSData? {
-        if let data = NSData(contentsOfFile: self.cachePath.stringByAppendingPathComponent(file)) {
-            if let encryptor = self.encryptor {
+        if let data = NSData(contentsOfFile: cachePath.stringByAppendingPathComponent(file)) {
+            if let encryptor = encryptor {
                 return encryptor.decryptedData(fromData: data)
             }
             return data
+        }
+        return nil
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+
+    // MARK: Bootstrap
+    ////////////////////////////////////////////////////////////////////////////
+
+    internal func bootstrapConfigurationData() -> NSData? {
+        if let bootstrapConfigurationFilePath = bootstrapConfigurationFilePath {
+            return NSData(contentsOfFile: bootstrapConfigurationFilePath)
         }
         return nil
     }
