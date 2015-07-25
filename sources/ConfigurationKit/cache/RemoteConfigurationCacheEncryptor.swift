@@ -8,7 +8,7 @@
 
 import UIKit
 
-public protocol RemoteConfigurationCacheEncryptor: NSObjectProtocol {
+public protocol RemoteConfigurationCacheEncryptor {
     func encryptedData(fromData data: NSData) -> NSData
     func decryptedData(fromData data: NSData) -> NSData
 }

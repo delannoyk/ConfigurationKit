@@ -48,6 +48,6 @@ public enum Result<T> {
     }
 }
 
-public protocol RemoteConfigurationParser: NSObjectProtocol {
+public protocol RemoteConfigurationParser {
     func parseData(data: NSData) -> Result<[String: String]>
 }
