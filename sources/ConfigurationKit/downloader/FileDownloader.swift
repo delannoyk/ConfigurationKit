@@ -25,24 +25,24 @@ internal final class FileDownloader: NSObject {
 
     var refreshWhenEnteringForeground = false {
         didSet {
-            if oldValue != self.refreshWhenEnteringForeground {
-                self.didUpdateRefreshWhenEnteringForeground()
+            if oldValue != refreshWhenEnteringForeground {
+                didUpdateRefreshWhenEnteringForeground()
             }
         }
     }
 
     var refreshOnIntervalBasis = false {
         didSet {
-            if oldValue != self.refreshOnIntervalBasis {
-                self.createTimerIfNecessary()
+            if oldValue != refreshOnIntervalBasis {
+                createTimerIfNecessary()
             }
         }
     }
 
     var refreshInterval = kFileDownloaderDefaultRefreshInterval {
         didSet {
-            if self.refreshOnIntervalBasis {
-                self.createTimerIfNecessary()
+            if refreshOnIntervalBasis {
+                createTimerIfNecessary()
             }
         }
     }
@@ -66,8 +66,8 @@ internal final class FileDownloader: NSObject {
             self.onRefreshBegin = beginBlock
             super.init()
 
-            self.didUpdateRefreshWhenEnteringForeground()
-            self.createTimerIfNecessary()
+            didUpdateRefreshWhenEnteringForeground()
+            createTimerIfNecessary()
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -97,17 +97,17 @@ internal final class FileDownloader: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
     func start() {
-        if !self.hasStart {
-            self.hasStart = true
+        if !hasStart {
+            hasStart = true
 
             //Initial mandatory refresh
-            self.refresh()
+            refresh()
         }
     }
 
     func stop() {
-        if self.hasStart {
-            self.hasStart = false
+        if hasStart {
+            hasStart = false
         }
     }
 
@@ -118,12 +118,12 @@ internal final class FileDownloader: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
     func timerTicked(NSTimer) {
-        self.refresh()
+        refresh()
     }
 
     func appWillEnterForeground(NSNotification) {
-        if self.hasStart {
-            self.refresh()
+        if hasStart {
+            refresh()
         }
     }
 
@@ -135,8 +135,8 @@ internal final class FileDownloader: NSObject {
 
     private func refresh() {
         //If tryLock fails that means a refresh is already being performed
-        if self.lock.tryLock() {
-            dispatch_async(self.dispatchQueue, { () -> Void in
+        if lock.tryLock() {
+            dispatch_async(dispatchQueue, { () -> Void in
                 if let URLRequest = self.onRefreshBegin() {
                     //Getting the data
                     let dataTask = NSURLSession.sharedSession().dataTaskWithRequest(URLRequest,
@@ -166,10 +166,10 @@ internal final class FileDownloader: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
     private func createTimerIfNecessary() {
-        self.invalidateTimer()
+        invalidateTimer()
 
-        if self.refreshOnIntervalBasis && self.hasStart {
-            self.timer = NSTimer.scheduledTimerWithTimeInterval(self.refreshInterval,
+        if refreshOnIntervalBasis && hasStart {
+            timer = NSTimer.scheduledTimerWithTimeInterval(refreshInterval,
                 target: self,
                 selector: "timerTicked:",
                 userInfo: nil,
@@ -178,10 +178,8 @@ internal final class FileDownloader: NSObject {
     }
 
     private func invalidateTimer() {
-        if let timer = self.timer {
-            timer.invalidate()
-        }
-        self.timer = nil
+        timer?.invalidate()
+        timer = nil
     }
 
     ////////////////////////////////////////////////////////////////////////////

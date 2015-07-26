@@ -19,7 +19,7 @@ public final class SimpleURLBuilder: NSObject, URLBuilder {
     }
 
     public init(URLRequest: NSURLRequest) {
-        self._URLRequest = URLRequest
+        _URLRequest = URLRequest
         super.init()
     }
 
@@ -30,7 +30,7 @@ public final class SimpleURLBuilder: NSObject, URLBuilder {
     ////////////////////////////////////////////////////////////////////////////
 
     public func URLRequest() -> NSURLRequest {
-        return self._URLRequest
+        return _URLRequest
     }
 
     ////////////////////////////////////////////////////////////////////////////
