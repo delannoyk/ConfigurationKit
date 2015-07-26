@@ -7,21 +7,21 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>04BA9148-347B-4D52-AA07-E10B60FB2861</string>
 	<key>IDESourceControlProjectName</key>
-	<string>ConfigurationKit</string>
+	<string>project</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>63204B21473F4F15AF5DEA10A9E52E4CD2D058F1</key>
-		<string>https://github.com/delannoyk/KDEConfigurationKit.git</string>
+		<string>https://github.com/delannoyk/ConfigurationKit.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>sources/ConfigurationKit.xcodeproj</string>
+	<string>sources/ConfigurationKit.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>63204B21473F4F15AF5DEA10A9E52E4CD2D058F1</key>
 		<string>../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/delannoyk/KDEConfigurationKit.git</string>
+	<string>https://github.com/delannoyk/ConfigurationKit.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
