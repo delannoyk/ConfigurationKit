@@ -76,14 +76,14 @@ public final class RemoteConfiguration: NSObject {
         self.configuration = [:]
         super.init()
 
-        self.setCachedProperties()
+        setCachedProperties()
 
-        self.fileDownloader.start()
+        fileDownloader.start()
     }
 
 
     deinit {
-        self.fileDownloader.stop()
+        fileDownloader.stop()
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -93,50 +93,51 @@ public final class RemoteConfiguration: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
     private func setCachedProperties() {
-        if let data = self.cache.cachedData(inFile: RemoteConfigurationConfigurationKey), configuration = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? [String: String] {
-            self.configuration = configuration
+        if let data = cache.cachedData(inFile: RemoteConfigurationConfigurationKey),
+            configuration = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? [String: String] {
+                self.configuration = configuration
         }
         else {
             //TODO: load bootstrap
         }
 
-        if let data = self.cache.cachedData(inFile: RemoteConfigurationDateKey), date = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? NSDate {
-            self.configurationDate = date
-        }
-        else {
-            //TODO: bootstrap?
+        if let data = cache.cachedData(inFile: RemoteConfigurationDateKey),
+            date = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? NSDate {
+                configurationDate = date
         }
 
-        if let data = self.cache.cachedData(inFile: RemoteConfigurationLastCycleDateKey), date = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? NSDate {
-            self.lastCycleDate = date
+        if let data = cache.cachedData(inFile: RemoteConfigurationLastCycleDateKey),
+            date = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? NSDate {
+                lastCycleDate = date
         }
 
-        if let data = self.cache.cachedData(inFile: RemoteConfigurationLastCycleErrorKey), error = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? NSError {
-            self.lastCycleError = error
+        if let data = cache.cachedData(inFile: RemoteConfigurationLastCycleErrorKey),
+            error = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? NSError {
+                lastCycleError = error
         }
     }
 
     private func cacheConfigurationInfo(#config: Bool, date: Bool) {
         if config {
-            self.cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(self.configuration), inFile: RemoteConfigurationConfigurationKey)
+            cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(configuration), inFile: RemoteConfigurationConfigurationKey)
         }
         if date {
-            if let configurationDate = self.configurationDate {
-                self.cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(configurationDate), inFile: RemoteConfigurationDateKey)
+            if let configurationDate = configurationDate {
+                cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(configurationDate), inFile: RemoteConfigurationDateKey)
             }
         }
     }
 
     private func cacheCycleInfo() {
-        if let lastCycleDate = self.lastCycleDate {
-            self.cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(lastCycleDate), inFile: RemoteConfigurationLastCycleDateKey)
+        if let lastCycleDate = lastCycleDate {
+            cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(lastCycleDate), inFile: RemoteConfigurationLastCycleDateKey)
         }
 
-        if let lastCycleError = self.lastCycleError {
-            self.cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(lastCycleError), inFile: RemoteConfigurationLastCycleErrorKey)
+        if let lastCycleError = lastCycleError {
+            cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(lastCycleError), inFile: RemoteConfigurationLastCycleErrorKey)
         }
         else {
-            self.cache.cacheData(nil, inFile: RemoteConfigurationLastCycleErrorKey)
+            cache.cacheData(nil, inFile: RemoteConfigurationLastCycleErrorKey)
         }
     }
 
@@ -147,7 +148,7 @@ public final class RemoteConfiguration: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
     public subscript(key: String) -> String? {
-        return self.configuration[key]
+        return configuration[key]
     }
 
     public func stringForKey(key: String) -> String? {
@@ -174,28 +175,28 @@ public final class RemoteConfiguration: NSObject {
 
     public var refreshWhenEnteringForeground: Bool {
         get {
-            return self.fileDownloader.refreshWhenEnteringForeground
+            return fileDownloader.refreshWhenEnteringForeground
         }
         set {
-            self.fileDownloader.refreshWhenEnteringForeground = newValue
+            fileDownloader.refreshWhenEnteringForeground = newValue
         }
     }
 
     public var refreshOnIntervalBasis: Bool {
         get {
-            return self.fileDownloader.refreshOnIntervalBasis
+            return fileDownloader.refreshOnIntervalBasis
         }
         set {
-            self.fileDownloader.refreshOnIntervalBasis = newValue
+            fileDownloader.refreshOnIntervalBasis = newValue
         }
     }
 
     public var refreshInterval: NSTimeInterval {
         get {
-            return self.fileDownloader.refreshInterval
+            return fileDownloader.refreshInterval
         }
         set {
-            self.fileDownloader.refreshInterval = newValue
+            fileDownloader.refreshInterval = newValue
         }
     }
 
@@ -206,14 +207,14 @@ public final class RemoteConfiguration: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
     private func fileDownloaderWillStart() -> NSURLRequest {
-        self.postNotificationNamed(RemoteConfigurationWillStartNewCycleNotification)
-        return self.builder.URLRequest()
+        postNotificationNamed(RemoteConfigurationWillStartNewCycleNotification)
+        return builder.URLRequest()
     }
 
     private func fileDownloaderCompletedWithData(data: NSData?, response: NSHTTPURLResponse?, error: NSError?) {
         if let data = data {
             //Parsing data
-            let result = self.parser.parseData(data)
+            let result = parser.parseData(data)
             if let configuration = result.result {
                 var hasChanges = false
 
@@ -223,7 +224,7 @@ public final class RemoteConfiguration: NSObject {
                         if existing != value {
                             hasChanges = true
 
-                            self.postNotificationNamed(RemoteConfigurationValueChangedNotification, userInfo: [
+                            postNotificationNamed(RemoteConfigurationValueChangedNotification, userInfo: [
                                 RemoteConfigurationKeyKey: key,
                                 RemoteConfigurationOldValueKey: existing,
                                 RemoteConfigurationNewValueKey: value
@@ -233,7 +234,7 @@ public final class RemoteConfiguration: NSObject {
                     else {
                         hasChanges = true
 
-                        self.postNotificationNamed(RemoteConfigurationNewKeyDetectedNotification, userInfo: [
+                        postNotificationNamed(RemoteConfigurationNewKeyDetectedNotification, userInfo: [
                             RemoteConfigurationKeyKey: key,
                             RemoteConfigurationNewValueKey: value
                         ])
@@ -257,22 +258,22 @@ public final class RemoteConfiguration: NSObject {
 
                 //Caching & saving date
                 self.configuration = configuration
-                self.configurationDate = NSDate()
-                self.lastCycleError = nil
-                self.cacheConfigurationInfo(config: hasChanges, date: true)
+                configurationDate = NSDate()
+                lastCycleError = nil
+                cacheConfigurationInfo(config: hasChanges, date: true)
             }
             else {
-                self.lastCycleError = result.error
+                lastCycleError = result.error
             }
         }
         else {
-            self.lastCycleError = error
+            lastCycleError = error
         }
 
         //Saving date
-        self.lastCycleDate = NSDate()
-        self.cacheCycleInfo()
-        self.postNotificationNamed(RemoteConfigurationDidEndCycleNotification)
+        lastCycleDate = NSDate()
+        cacheCycleInfo()
+        postNotificationNamed(RemoteConfigurationDidEndCycleNotification)
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -283,7 +284,7 @@ public final class RemoteConfiguration: NSObject {
 
     private func postNotificationNamed(name: String, userInfo: [NSObject: AnyObject]? = nil) {
         dispatch_sync(dispatch_get_main_queue(), {[weak self] () -> Void in
-            var note = NSNotification(name: name, object: self, userInfo: userInfo)
+            let note = NSNotification(name: name, object: self, userInfo: userInfo)
             NSNotificationCenter.defaultCenter().postNotification(note)
         })
     }
@@ -295,11 +296,11 @@ public final class RemoteConfiguration: NSObject {
     ////////////////////////////////////////////////////////////////////////////
 
     override public var description: String {
-        return self.configuration.description
+        return configuration.description
     }
 
     override public var debugDescription: String {
-        return self.configuration.debugDescription
+        return configuration.debugDescription
     }
 
     ////////////////////////////////////////////////////////////////////////////
