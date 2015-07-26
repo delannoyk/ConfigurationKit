@@ -97,8 +97,9 @@ public final class RemoteConfiguration: NSObject {
             configuration = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? [String: String] {
                 self.configuration = configuration
         }
-        else {
-            //TODO: load bootstrap
+        else if let data = cache.bootstrapConfigurationData(),
+            configuration = parser.parseData(data).result {
+                self.configuration = configuration
         }
 
         if let data = cache.cachedData(inFile: RemoteConfigurationDateKey),
