@@ -117,11 +117,11 @@ internal final class FileDownloader: NSObject {
     // MARK: Refresh invocators
     ////////////////////////////////////////////////////////////////////////////
 
-    func timerTicked(NSTimer) {
+    @objc private func timerTicked(NSTimer) {
         refresh()
     }
 
-    func appWillEnterForeground(NSNotification) {
+    @objc private func appWillEnterForeground(NSNotification) {
         if hasStart {
             refresh()
         }
