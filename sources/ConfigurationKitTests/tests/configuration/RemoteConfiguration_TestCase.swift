@@ -15,7 +15,7 @@ class RemoteConfiguration_TestCase: XCTestCase {
         let URL = NSURL(string: "https://raw.githubusercontent.com/delannoyk/KDEConfigurationKit/master/sources/ConfigurationKitTests/resources/SampleConfig.json")!
 
         let URLBuilder = SimpleURLBuilder(URL: URL)
-        let configuration = RemoteConfiguration(builder: URLBuilder, parser: RemoteConfigurationFlatJSONParser(), cache: RemoteConfigurationCache(identifier: "123", encryptor: nil))
+        let configuration = RemoteConfiguration(builder: URLBuilder, parser: RemoteConfigurationFlatJSONParser(), cache: try! RemoteConfigurationCache(identifier: "123", encryptor: nil))
 
         let expectation = expectationWithDescription("Waiting for cycle completed notification")
 
@@ -25,7 +25,7 @@ class RemoteConfiguration_TestCase: XCTestCase {
         }
 
         waitForExpectationsWithTimeout(10, handler: { (error) -> Void in
-
+            NSNotificationCenter.defaultCenter().removeObserver(observer)
         })
     }
 }

@@ -21,6 +21,7 @@
 		4633D0AB1B63A7FE00EB10D5 /* SampleConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4633D0AA1B63A7FE00EB10D5 /* SampleConfig.plist */; };
 		4633D0AC1B64112200EB10D5 /* FileDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4613B5C21A3E1F10001DB168 /* FileDownloader.swift */; };
 		4644B9AF1B6410B7003253FA /* FileDownloader_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4644B9AE1B6410B7003253FA /* FileDownloader_TestCase.swift */; };
+		466930781BAC7CD300C1E97C /* NSURLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930771BAC7CD300C1E97C /* NSURLExtension.swift */; settings = {ASSET_TAGS = (); }; };
 		4698756C1AE1768700A0AB37 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4698756B1AE1768700A0AB37 /* StringExtension.swift */; };
 		46ABA7241AC7FE640073CBA4 /* RemoteConfiguration_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46ABA7231AC7FE640073CBA4 /* RemoteConfiguration_TestCase.swift */; };
 		46ABA7261AC7FED10073CBA4 /* RemoteConfigurationFlatJSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46ABA7251AC7FED10073CBA4 /* RemoteConfigurationFlatJSONParser.swift */; };
@@ -55,6 +56,7 @@
 		4633D0A81B63A7E600EB10D5 /* SampleConfig.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = SampleConfig.json; sourceTree = "<group>"; };
 		4633D0AA1B63A7FE00EB10D5 /* SampleConfig.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SampleConfig.plist; sourceTree = "<group>"; };
 		4644B9AE1B6410B7003253FA /* FileDownloader_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileDownloader_TestCase.swift; sourceTree = "<group>"; };
+		466930771BAC7CD300C1E97C /* NSURLExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSURLExtension.swift; sourceTree = "<group>"; };
 		4698756B1AE1768700A0AB37 /* StringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		46ABA7231AC7FE640073CBA4 /* RemoteConfiguration_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteConfiguration_TestCase.swift; sourceTree = "<group>"; };
 		46ABA7251AC7FED10073CBA4 /* RemoteConfigurationFlatJSONParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationFlatJSONParser.swift; sourceTree = "<group>"; };
@@ -231,6 +233,7 @@
 			isa = PBXGroup;
 			children = (
 				4698756B1AE1768700A0AB37 /* StringExtension.swift */,
+				466930771BAC7CD300C1E97C /* NSURLExtension.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -299,8 +302,9 @@
 		4613B58A1A3E0FD2001DB168 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0620;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Kevin Delannoy";
 				TargetAttributes = {
 					4613B5921A3E0FD2001DB168 = {
@@ -355,6 +359,7 @@
 			files = (
 				4613B5BC1A3E15B5001DB168 /* URLBuilder.swift in Sources */,
 				4613B5C61A3E1F85001DB168 /* RemoteConfigurationParser.swift in Sources */,
+				466930781BAC7CD300C1E97C /* NSURLExtension.swift in Sources */,
 				46B121131AE23EEA003E0BD8 /* RemoteConfigurationCacheEncryptor.swift in Sources */,
 				4613B5C31A3E1F10001DB168 /* FileDownloader.swift in Sources */,
 				4613B5BA1A3E15B5001DB168 /* RemoteConfiguration.swift in Sources */,
@@ -411,6 +416,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -487,6 +493,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "be.delannoyk.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -505,6 +512,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "be.delannoyk.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -524,6 +532,7 @@
 				);
 				INFOPLIST_FILE = ConfigurationKitTests/supporting_files/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "be.delannoyk.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -539,6 +548,7 @@
 				);
 				INFOPLIST_FILE = ConfigurationKitTests/supporting_files/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "be.delannoyk.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

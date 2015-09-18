@@ -118,27 +118,27 @@ public final class RemoteConfiguration: NSObject {
         }
     }
 
-    private func cacheConfigurationInfo(#config: Bool, date: Bool) {
+    private func cacheConfigurationInfo(config config: Bool, date: Bool) throws {
         if config {
-            cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(configuration), inFile: RemoteConfigurationConfigurationKey)
+            try cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(configuration), inFile: RemoteConfigurationConfigurationKey)
         }
         if date {
             if let configurationDate = configurationDate {
-                cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(configurationDate), inFile: RemoteConfigurationDateKey)
+                try cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(configurationDate), inFile: RemoteConfigurationDateKey)
             }
         }
     }
 
-    private func cacheCycleInfo() {
+    private func cacheCycleInfo() throws {
         if let lastCycleDate = lastCycleDate {
-            cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(lastCycleDate), inFile: RemoteConfigurationLastCycleDateKey)
+            try cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(lastCycleDate), inFile: RemoteConfigurationLastCycleDateKey)
         }
 
         if let lastCycleError = lastCycleError {
-            cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(lastCycleError), inFile: RemoteConfigurationLastCycleErrorKey)
+            try cache.cacheData(NSKeyedArchiver.archivedDataWithRootObject(lastCycleError), inFile: RemoteConfigurationLastCycleErrorKey)
         }
         else {
-            cache.cacheData(nil, inFile: RemoteConfigurationLastCycleErrorKey)
+            try cache.cacheData(nil, inFile: RemoteConfigurationLastCycleErrorKey)
         }
     }
 
@@ -243,25 +243,25 @@ public final class RemoteConfiguration: NSObject {
                 }
 
                 //Analyzing key removal
-                let newConfigurationKeys = configuration.keys.array
-                let removed = filter(self.configuration.keys.array, { element in
-                    if !contains(newConfigurationKeys, element) {
+                let newConfigurationKeys = configuration.keys
+                self.configuration.keys.forEach {
+                    if newConfigurationKeys.contains($0) {
                         hasChanges = true
 
                         self.postNotificationNamed(RemoteConfigurationKeyRemovalDetectedNotification, userInfo: [
-                            RemoteConfigurationKeyKey: element,
-                            RemoteConfigurationOldValueKey: self[element] ?? ""
-                        ])
-                        return true
+                            RemoteConfigurationKeyKey: $0,
+                            RemoteConfigurationOldValueKey: self[$0] ?? ""
+                            ])
                     }
-                    return false
-                })
+                }
 
                 //Caching & saving date
                 self.configuration = configuration
                 configurationDate = NSDate()
                 lastCycleError = nil
-                cacheConfigurationInfo(config: hasChanges, date: true)
+                do {
+                    try cacheConfigurationInfo(config: hasChanges, date: true)
+                } catch {}
             }
             else {
                 lastCycleError = result.error
@@ -273,7 +273,9 @@ public final class RemoteConfiguration: NSObject {
 
         //Saving date
         lastCycleDate = NSDate()
-        cacheCycleInfo()
+        do {
+            try cacheCycleInfo()
+        } catch {}
         postNotificationNamed(RemoteConfigurationDidEndCycleNotification)
     }
 

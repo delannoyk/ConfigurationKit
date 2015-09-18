@@ -13,10 +13,14 @@ public struct RemoteConfigurationFlatJSONParser: RemoteConfigurationParser {
     }
 
     public func parseData(data: NSData) -> Result<[String: String]> {
-        var error: NSError? = nil
-        if let JSONObject = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &error) as? [String: String] {
-            return .Success(Box(JSONObject))
+        do {
+            if let JSONObject = try NSJSONSerialization.JSONObjectWithData(data, options: []) as? [String: String] {
+                return .Success(Box(JSONObject))
+            }
         }
-        return .Failure(error ?? NSError(domain: "\(RemoteConfigurationFlatJSONParser.self)", code: 0, userInfo: nil))
+        catch let error as NSError {
+            return .Failure(error)
+        }
+        return .Failure(NSError(domain: "\(RemoteConfigurationFlatJSONParser.self)", code: 0, userInfo: nil))
     }
 }

@@ -16,11 +16,14 @@ public struct RemoteConfigurationPListParser: RemoteConfigurationParser {
     }
 
     public func parseData(data: NSData) -> Result<[String: String]> {
-        var error: NSError?
-        var format = self.format
-
-        if let dictionary = NSPropertyListSerialization.propertyListWithData(data, options: .allZeros, format: &format, error: &error) as? [String: String] {
-            return .Success(Box(dictionary))
+        do {
+            var format = self.format
+            if let dictionary = try NSPropertyListSerialization.propertyListWithData(data, options: [], format: &format) as? [String: String] {
+                return .Success(Box(dictionary))
+            }
+        }
+        catch let error as NSError {
+            return .Failure(error)
         }
         return .Failure(NSError(domain: "\(RemoteConfigurationPListParser.self)", code: 0, userInfo: nil))
     }

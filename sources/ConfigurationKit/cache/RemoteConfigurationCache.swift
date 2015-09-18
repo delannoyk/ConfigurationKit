@@ -9,22 +9,20 @@
 import UIKit
 
 public struct RemoteConfigurationCache {
-    private let cachePath: String
+    private let cacheURL: NSURL
     private let bootstrapConfigurationFilePath: String?
     private let encryptor: RemoteConfigurationCacheEncryptor?
 
     // MARK: Initialization
     ////////////////////////////////////////////////////////////////////////////
 
-    public init(identifier: String, bootstrapConfigurationFilePath: String? = nil, encryptor: RemoteConfigurationCacheEncryptor? = nil) {
-        let configurationDirectory = String.documentPath.stringByAppendingPathComponent("ConfigurationKit")
-        configurationDirectory.createDirectoryIfNecesserary()
+    public init(identifier: String, bootstrapConfigurationFilePath: String? = nil, encryptor: RemoteConfigurationCacheEncryptor? = nil) throws {
+        let configurationDirectory = NSURL(fileURLWithPath: String.documentPath).URLByAppendingPathComponent("ConfigurationKit")
+        try configurationDirectory.createDirectoryIfNecesserary()
 
-        cachePath = configurationDirectory.stringByAppendingPathComponent("\(identifier).rconf")
-        cachePath.createDirectoryIfNecesserary()
+        cacheURL = configurationDirectory
 
         self.bootstrapConfigurationFilePath = bootstrapConfigurationFilePath
-
         self.encryptor = encryptor
     }
 
@@ -34,28 +32,23 @@ public struct RemoteConfigurationCache {
     // MARK: Caching
     ////////////////////////////////////////////////////////////////////////////
 
-    internal func cacheData(data: NSData?, inFile file: String) {
-        let path = cachePath.stringByAppendingPathComponent(file)
+    internal func cacheData(data: NSData?, inFile file: String) throws {
+        let URL = cacheURL.URLByAppendingPathComponent(file)
         if let data = data {
-            let toWrite: NSData = {
-                if let encryptor = self.encryptor {
-                    return encryptor.encryptedData(fromData: data)
-                }
-                return data
-            }()
-            toWrite.writeToFile(path, atomically: true)
+            let finalData = encryptor?.encryptedData(fromData: data) ?? data
+            try finalData.writeToURL(URL, options: .AtomicWrite)
         }
         else {
-            NSFileManager.defaultManager().removeItemAtPath(path, error: nil)
+            if let path = URL.path {
+                try NSFileManager.defaultManager().removeItemAtPath(path)
+            }
         }
     }
 
     internal func cachedData(inFile file: String) -> NSData? {
-        if let data = NSData(contentsOfFile: cachePath.stringByAppendingPathComponent(file)) {
-            if let encryptor = encryptor {
-                return encryptor.decryptedData(fromData: data)
-            }
-            return data
+        let URL = cacheURL.URLByAppendingPathComponent(file)
+        if let data = NSData(contentsOfURL: URL) {
+            return encryptor?.decryptedData(fromData: data) ?? data
         }
         return nil
     }
