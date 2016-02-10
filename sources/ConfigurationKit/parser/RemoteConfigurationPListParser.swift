@@ -19,7 +19,7 @@ public struct RemoteConfigurationPListParser: RemoteConfigurationParser {
         do {
             var format = self.format
             if let dictionary = try NSPropertyListSerialization.propertyListWithData(data, options: [], format: &format) as? [String: String] {
-                return .Success(Box(dictionary))
+                return .Success(dictionary)
             }
         }
         catch let error as NSError {

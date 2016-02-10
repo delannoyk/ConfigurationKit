@@ -15,7 +15,7 @@ public struct RemoteConfigurationFlatJSONParser: RemoteConfigurationParser {
     public func parseData(data: NSData) -> Result<[String: String]> {
         do {
             if let JSONObject = try NSJSONSerialization.JSONObjectWithData(data, options: []) as? [String: String] {
-                return .Success(Box(JSONObject))
+                return .Success(JSONObject)
             }
         }
         catch let error as NSError {

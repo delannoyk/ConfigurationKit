@@ -8,16 +8,8 @@
 
 import Foundation
 
-public final class Box<T> {
-    public let value: T
-
-    internal init(_ value: T) {
-        self.value = value
-    }
-}
-
 public enum Result<T> {
-    case Success(Box<T>)
+    case Success(T)
     case Failure(NSError)
 
     public var isSuccessful: Bool {
@@ -32,7 +24,7 @@ public enum Result<T> {
     public var result: T? {
         switch self {
         case .Success(let result):
-            return result.value
+            return result
         default:
             return nil
         }
