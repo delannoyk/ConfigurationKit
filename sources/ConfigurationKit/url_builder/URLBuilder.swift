@@ -8,6 +8,14 @@
 
 import Foundation
 
+/**
+ *  An `URLBuilder` serves the purpose of building a `NSURLRequest`.
+ */
 public protocol URLBuilder {
+    /**
+     Builds a `NSURLRequest` that heads to a configuration file.
+
+     - returns: A valid `NSURLRequest` that heads to a configuration file.
+     */
     func URLRequest() -> NSURLRequest
 }
