@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Kevin Delannoy. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 public final class Box<T> {
     public let value: T

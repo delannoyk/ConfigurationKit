@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Kevin Delannoy. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 // MARK: - Notification
 ////////////////////////////////////////////////////////////////////////////
