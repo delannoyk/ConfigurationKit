@@ -6,13 +6,21 @@
 //  Copyright © 2016 Kevin Delannoy. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
+/**
+ Represents a change.
+
+ - Addition: An addition. The key didn't exist before.
+ - Change:   A change. The `oldValue` differs from the `newValue`.
+ - Removal:  A removal. The key doesn't exist anymore.
+ */
 enum Change<Key, Value> {
     case Addition(Key, Value)
     case Change(Key, Value, Value)
     case Removal(Key, Value)
 
+    /// Returns the impacted key.
     var key: Key {
         switch self {
         case .Addition(let key, _):
@@ -24,6 +32,7 @@ enum Change<Key, Value> {
         }
     }
 
+    /// Returns the old value.
     var oldValue: Value? {
         switch self {
         case .Change(_, let value, _):
@@ -35,6 +44,7 @@ enum Change<Key, Value> {
         }
     }
 
+    /// Returns the new value.
     var newValue: Value? {
         switch self {
         case .Addition(_, let value):
@@ -46,6 +56,7 @@ enum Change<Key, Value> {
         }
     }
 
+    /// Returns a boolean value indicating whether the change is an addition or not.
     var isAddition: Bool {
         switch self {
         case .Addition:
@@ -55,6 +66,7 @@ enum Change<Key, Value> {
         }
     }
 
+    /// Returns a boolean value indicating whether the change is a value change or not.
     var isChange: Bool {
         switch self {
         case .Change:
@@ -64,6 +76,7 @@ enum Change<Key, Value> {
         }
     }
 
+    /// Returns a boolean value indicating whether the change is a removal or not.
     var isRemoval: Bool {
         switch self {
         case .Removal:
@@ -75,6 +88,13 @@ enum Change<Key, Value> {
 }
 
 extension Dictionary where Value: Equatable {
+    /**
+     Computes differences between 2 dictionaries.
+
+     - parameter other: The dictionary to compute the difference with.
+
+     - returns: List of changes.
+     */
     func delta(other: [Key: Value]) -> [Change<Key, Value>] {
         var changes = [Change<Key, Value>]()
         //Let's look for changes and removals
