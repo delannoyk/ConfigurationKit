@@ -8,19 +8,18 @@
 
 import Foundation
 
-public final class SimpleURLBuilder: NSObject, URLBuilder {
+public struct SimpleURLBuilder: URLBuilder {
     private let _URLRequest: NSURLRequest
 
     // MARK: Initialization
     ////////////////////////////////////////////////////////////////////////////
 
-    public convenience init(URL: NSURL) {
+    public init(URL: NSURL) {
         self.init(URLRequest: NSURLRequest(URL: URL))
     }
 
     public init(URLRequest: NSURLRequest) {
         _URLRequest = URLRequest
-        super.init()
     }
 
     ////////////////////////////////////////////////////////////////////////////

@@ -8,6 +8,6 @@
 
 import Foundation
 
-public protocol URLBuilder: NSObjectProtocol {
+public protocol URLBuilder {
     func URLRequest() -> NSURLRequest
 }
