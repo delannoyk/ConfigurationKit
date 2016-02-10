@@ -217,50 +217,40 @@ public final class RemoteConfiguration: NSObject {
             //Parsing data
             let result = parser.parseData(data)
             if let configuration = result.result {
-                var hasChanges = false
-
                 //Analyzing key changes & new value
-                for (key, value) in configuration {
-                    if let existing = self[key] {
-                        if existing != value {
-                            hasChanges = true
+                let differences = self.configuration.delta(configuration)
+                self.configuration = configuration
 
-                            postNotificationNamed(RemoteConfigurationValueChangedNotification, userInfo: [
-                                RemoteConfigurationKeyKey: key,
-                                RemoteConfigurationOldValueKey: existing,
-                                RemoteConfigurationNewValueKey: value
-                            ])
-                        }
+                differences.forEach { change in
+                    let name: String
+                    let userInfo: [NSObject: AnyObject]
+
+                    switch change {
+                    case .Addition(let key, let value):
+                        name = RemoteConfigurationNewKeyDetectedNotification
+                        userInfo = [RemoteConfigurationKeyKey: key,
+                            RemoteConfigurationNewValueKey: value]
+
+                    case .Change(let key, let oldValue, let newValue):
+                        name = RemoteConfigurationValueChangedNotification
+                        userInfo = [RemoteConfigurationKeyKey: key,
+                            RemoteConfigurationOldValueKey: oldValue,
+                            RemoteConfigurationNewValueKey: newValue]
+
+                    case .Removal(let key, let value):
+                        name = RemoteConfigurationKeyRemovalDetectedNotification
+                        userInfo = [RemoteConfigurationKeyKey:
+                            key, RemoteConfigurationOldValueKey: value]
                     }
-                    else {
-                        hasChanges = true
 
-                        postNotificationNamed(RemoteConfigurationNewKeyDetectedNotification, userInfo: [
-                            RemoteConfigurationKeyKey: key,
-                            RemoteConfigurationNewValueKey: value
-                        ])
-                    }
-                }
-
-                //Analyzing key removal
-                let newConfigurationKeys = configuration.keys
-                self.configuration.keys.forEach {
-                    if newConfigurationKeys.contains($0) {
-                        hasChanges = true
-
-                        self.postNotificationNamed(RemoteConfigurationKeyRemovalDetectedNotification, userInfo: [
-                            RemoteConfigurationKeyKey: $0,
-                            RemoteConfigurationOldValueKey: self[$0] ?? ""
-                            ])
-                    }
+                    postNotificationNamed(name, userInfo: userInfo)
                 }
 
                 //Caching & saving date
-                self.configuration = configuration
                 configurationDate = NSDate()
                 lastCycleError = nil
                 do {
-                    try cacheConfigurationInfo(config: hasChanges, date: true)
+                    try cacheConfigurationInfo(config: (differences.count > 0), date: true)
                 } catch {}
             }
             else {

@@ -21,12 +21,14 @@
 		4633D0AB1B63A7FE00EB10D5 /* SampleConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4633D0AA1B63A7FE00EB10D5 /* SampleConfig.plist */; };
 		4633D0AC1B64112200EB10D5 /* FileDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4613B5C21A3E1F10001DB168 /* FileDownloader.swift */; };
 		4644B9AF1B6410B7003253FA /* FileDownloader_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4644B9AE1B6410B7003253FA /* FileDownloader_TestCase.swift */; };
-		466930781BAC7CD300C1E97C /* NSURLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930771BAC7CD300C1E97C /* NSURLExtension.swift */; settings = {ASSET_TAGS = (); }; };
+		466930781BAC7CD300C1E97C /* NSURLExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466930771BAC7CD300C1E97C /* NSURLExtension.swift */; };
 		4698756C1AE1768700A0AB37 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4698756B1AE1768700A0AB37 /* StringExtension.swift */; };
 		46ABA7241AC7FE640073CBA4 /* RemoteConfiguration_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46ABA7231AC7FE640073CBA4 /* RemoteConfiguration_TestCase.swift */; };
 		46ABA7261AC7FED10073CBA4 /* RemoteConfigurationFlatJSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46ABA7251AC7FED10073CBA4 /* RemoteConfigurationFlatJSONParser.swift */; };
 		46B121131AE23EEA003E0BD8 /* RemoteConfigurationCacheEncryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B121121AE23EEA003E0BD8 /* RemoteConfigurationCacheEncryptor.swift */; };
 		46C19CD31AC845AD0023537A /* RemoteConfigurationCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46C19CD21AC845AD0023537A /* RemoteConfigurationCache.swift */; };
+		46F655801C6A10440000C0D7 /* DictionaryExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F6557F1C6A10440000C0D7 /* DictionaryExtension.swift */; };
+		46F655831C6A13D40000C0D7 /* DictionaryExtension_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F655821C6A13D40000C0D7 /* DictionaryExtension_TestCase.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +64,8 @@
 		46ABA7251AC7FED10073CBA4 /* RemoteConfigurationFlatJSONParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationFlatJSONParser.swift; sourceTree = "<group>"; };
 		46B121121AE23EEA003E0BD8 /* RemoteConfigurationCacheEncryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationCacheEncryptor.swift; sourceTree = "<group>"; };
 		46C19CD21AC845AD0023537A /* RemoteConfigurationCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationCache.swift; sourceTree = "<group>"; };
+		46F6557F1C6A10440000C0D7 /* DictionaryExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DictionaryExtension.swift; sourceTree = "<group>"; };
+		46F655821C6A13D40000C0D7 /* DictionaryExtension_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DictionaryExtension_TestCase.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -179,6 +183,7 @@
 		461AADF51A55D509005183C5 /* tests */ = {
 			isa = PBXGroup;
 			children = (
+				46F655811C6A13880000C0D7 /* utils */,
 				461AADF71A55D52A005183C5 /* configuration */,
 				461AADF61A55D519005183C5 /* url_builder */,
 				461AADF81A55D538005183C5 /* downloader */,
@@ -234,6 +239,7 @@
 			children = (
 				4698756B1AE1768700A0AB37 /* StringExtension.swift */,
 				466930771BAC7CD300C1E97C /* NSURLExtension.swift */,
+				46F6557F1C6A10440000C0D7 /* DictionaryExtension.swift */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -245,6 +251,14 @@
 				46B121121AE23EEA003E0BD8 /* RemoteConfigurationCacheEncryptor.swift */,
 			);
 			path = cache;
+			sourceTree = "<group>";
+		};
+		46F655811C6A13880000C0D7 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				46F655821C6A13D40000C0D7 /* DictionaryExtension_TestCase.swift */,
+			);
+			path = utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -361,6 +375,7 @@
 				4613B5C61A3E1F85001DB168 /* RemoteConfigurationParser.swift in Sources */,
 				466930781BAC7CD300C1E97C /* NSURLExtension.swift in Sources */,
 				46B121131AE23EEA003E0BD8 /* RemoteConfigurationCacheEncryptor.swift in Sources */,
+				46F655801C6A10440000C0D7 /* DictionaryExtension.swift in Sources */,
 				4613B5C31A3E1F10001DB168 /* FileDownloader.swift in Sources */,
 				4613B5BA1A3E15B5001DB168 /* RemoteConfiguration.swift in Sources */,
 				4698756C1AE1768700A0AB37 /* StringExtension.swift in Sources */,
@@ -381,6 +396,7 @@
 				4644B9AF1B6410B7003253FA /* FileDownloader_TestCase.swift in Sources */,
 				460FA82A1B63A6AA00BBE0EE /* RemoteConfigurationFlatJSONParser_TestCase.swift in Sources */,
 				46ABA7241AC7FE640073CBA4 /* RemoteConfiguration_TestCase.swift in Sources */,
+				46F655831C6A13D40000C0D7 /* DictionaryExtension_TestCase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -522,10 +538,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -542,10 +554,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
 				INFOPLIST_FILE = ConfigurationKitTests/supporting_files/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "be.delannoyk.$(PRODUCT_NAME:rfc1034identifier)";
