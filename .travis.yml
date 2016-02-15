@@ -1,0 +1,27 @@
+language: objective-c
+osx_image: xcode7.2
+env:
+  global:
+  - LC_CTYPE=en_US.UTF-8
+  - LANG=en_US.UTF-8
+  - PROJECT=sources/ConfigurationKit.xcodeproj
+  - IOS_FRAMEWORK_SCHEME="ConfigurationKit"
+  - IOS_SDK=iphonesimulator9.2
+  matrix:
+    - DESTINATION="OS=8.1,name=iPhone 4S"      SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"
+    - DESTINATION="OS=8.2,name=iPhone 5"       SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"
+    - DESTINATION="OS=8.3,name=iPhone 5S"      SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"
+    - DESTINATION="OS=8.4,name=iPhone 6"       SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"
+    - DESTINATION="OS=9.0,name=iPhone 6 Plus"  SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"
+    - DESTINATION="OS=9.1,name=iPhone 6S"      SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"
+    - DESTINATION="OS=9.2,name=iPhone 6S Plus" SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"
+script:
+  - set -o pipefail
+  - xcodebuild -version
+  - xcodebuild -showsdks
+
+  # Build Framework in Debug and Run Tests if specified
+  - xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" -configuration Debug ONLY_ACTIVE_ARCH=NO build | xcpretty -c;
+notifications:
+  slack:
+    secure: fUy7u8lQYbk01yYuLvI0R9b36F9Lh/rtNHwf1JLcVXuj3A+iOiE8E6NzyIFv+49pyG7KCRRaOyh5U/d8QCqsGelSn+RYHcYWmxmIo/sjynisBNDsU3BenfzZBKv4fhtiXn7WylwrgY5I96NOjTWoFvnLX/pncFDYc3ITFiE2j0M=
