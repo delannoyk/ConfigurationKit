@@ -15,13 +15,13 @@ import Foundation
  - Change:   A change. The `oldValue` differs from the `newValue`.
  - Removal:  A removal. The key doesn't exist anymore.
  */
-enum Change<Key, Value> {
+public enum Change<Key, Value> {
     case Addition(Key, Value)
     case Change(Key, Value, Value)
     case Removal(Key, Value)
 
     /// Returns the impacted key.
-    var key: Key {
+    public var key: Key {
         switch self {
         case .Addition(let key, _):
             return key
@@ -33,7 +33,7 @@ enum Change<Key, Value> {
     }
 
     /// Returns the old value.
-    var oldValue: Value? {
+    public var oldValue: Value? {
         switch self {
         case .Change(_, let value, _):
             return value
@@ -45,7 +45,7 @@ enum Change<Key, Value> {
     }
 
     /// Returns the new value.
-    var newValue: Value? {
+    public var newValue: Value? {
         switch self {
         case .Addition(_, let value):
             return value
@@ -57,7 +57,7 @@ enum Change<Key, Value> {
     }
 
     /// Returns a boolean value indicating whether the change is an addition or not.
-    var isAddition: Bool {
+    public var isAddition: Bool {
         switch self {
         case .Addition:
             return true
@@ -67,7 +67,7 @@ enum Change<Key, Value> {
     }
 
     /// Returns a boolean value indicating whether the change is a value change or not.
-    var isChange: Bool {
+    public var isChange: Bool {
         switch self {
         case .Change:
             return true
@@ -77,7 +77,7 @@ enum Change<Key, Value> {
     }
 
     /// Returns a boolean value indicating whether the change is a removal or not.
-    var isRemoval: Bool {
+    public var isRemoval: Bool {
         switch self {
         case .Removal:
             return true

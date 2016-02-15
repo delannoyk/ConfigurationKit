@@ -12,7 +12,7 @@ import UIKit
 
 class FileDownloader_TestCase: XCTestCase {
     //Testing auto-refresh
-    func testAutoRefreshEnabled() {
+    /*func testAutoRefreshEnabled() {
         let onBegin = { () -> NSURLRequest? in
             let bundle = NSBundle(forClass: FileDownloader_TestCase.self)
             if let URL = bundle.URLForResource("SampleConfig", withExtension: "plist") {
@@ -129,5 +129,5 @@ class FileDownloader_TestCase: XCTestCase {
             XCTAssert(refreshCount == 2, "We should have refreshed twice (.start() + foreground)")
             XCTAssert(NSDate().timeIntervalSinceDate(date!) < 1, "The refresh should have happened in less than a sec")
         })
-    }
+    }*/
 }
