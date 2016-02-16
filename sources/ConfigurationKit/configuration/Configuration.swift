@@ -9,27 +9,49 @@
 import Foundation
 
 /**
- *  <#Description#>
+ *  Implementing this protocol makes your class eligible to Configuration alerts
+ *  about cycles and changes.
  */
 public protocol ConfigurationDelegate: class {
+    /**
+     Lets you know that the configuration will begin a new cycle because an
+     EventProducer fired.
+
+     - parameter configuration: The configuration.
+     */
     func configurationWillBeginCycle(configuration: Configuration)
-    func configuration(configuration: Configuration, didDetectChange: Change<String, String>)
+
+    /**
+     Alerts that the configuration found a change after downloading and parsing
+     a new configuration file.
+
+     - parameter configuration: The configuration.
+     - parameter change:        The change that has been detected.
+     */
+    func configuration(configuration: Configuration, didDetectChange change: Change<String, String>)
+
+    /**
+     Lets you know that the configuration did end the current cycle.
+
+     - parameter configuration: The configuration.
+     - parameter error:         The error that happened if any.
+     */
     func configuration(configuration: Configuration, didEndCycleWithError error: ErrorType?)
 }
 
 /**
- *  <#Description#>
+ *  This is a wrapper around ConfigurationDelegate to be weak.
  */
 private final class WeakDelegate {
-    /// <#Description#>
+    /// The delegate.
     weak var delegate: ConfigurationDelegate?
 
     /**
-     <#Description#>
+     Initializes a new `WeakDelegate` from a delegate.
 
-     - parameter delegate: <#value description#>
+     - parameter delegate: The delegate.
 
-     - returns: <#return value description#>
+     - returns: An initialized `WeakDelegate`.
      */
     init(_ delegate: ConfigurationDelegate) {
         self.delegate = delegate
@@ -108,6 +130,9 @@ public final class Configuration {
         //TODO: start event producers
     }
 
+    /**
+     Stops event producers.
+     */
     deinit {
         eventProducers.forEach {
             $0.eventListener = nil
