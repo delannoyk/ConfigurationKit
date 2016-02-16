@@ -64,55 +64,57 @@ private final class WeakDelegate {
 public final class Configuration {
     //private let eventListener = InternalEventListener()
 
-    /// <#Description#>
+    /// The lock used to access configuration.
     private let configurationMutex = NSLock()
 
-    /// <#Description#>
+    /// The lock used to prevent multiple events to override each other.
     private let cycleMutex = NSLock()
 
-    /// <#Description#>
+    /// The queue used to perform cycles.
     private let cycleQueue = dispatch_queue_create("be.delannoyk.configurationkit", nil)
 
-    /// <#Description#>
+    /// The delegates.
     private var delegates = [WeakDelegate]()
 
-    /// <#Description#>
+    /// The current configuration.
     private var configuration: [String: String]
 
-    /// <#Description#>
+    /// The encryptor used to decrypt downloaded file.
     private let downloadEncryptor: Encryptor?
 
-    /// <#Description#>
+    /// The encryptor used to encrypt/decrypt the configuration cached.
     private let cacheEncryptor: Encryptor?
 
-    /// <#Description#>
+    /// The cacher to use to make the configuration persistent.
     private let cacher: Cacher?
 
-    /// <#Description#>
+    /// The builder used to create an URL when needed.
     private let urlBuilder: URLBuilder
 
-    /// <#Description#>
+    /// The parser used to parse a configuration file.
     private let parser: Parser
 
-    /// <#Description#>
+    /// The list of event producers that generate events when a new cycle
+    /// should be started.
     private let eventProducers: [EventProducer]
 
-    /// <#Description#>
+    /// The downloader used to download a configuration file.
     internal var downloader: Downloader
 
-    /// <#Description#>
+    /// The initial configuration when no download has previously been made.
     private let bundleConfigurationFilePath: String?
 
-    /// <#Description#>
-    public var cancelCurrentRequestWhenEventOccursBeforeEnd = true
+    /// Let's you specify whether an new event should cancel any current request
+    /// to be sure you always have the latest version of the configuration.
+    public var cancelCurrentRequestWhenEventOccursBeforeEnd = false
 
-    /// <#Description#>
-    public private(set) var configurationDate: NSDate?
+    /// The date of the last refresh of configuration.
+    public private(set) var configurationDate: NSDate
 
-    /// <#Description#>
+    /// The date when the last cycle happened.
     public private(set) var lastCycleDate: NSDate?
 
-    /// <#Description#>
+    /// The error that happened at last cycle if any.
     public private(set) var lastCycleError: ErrorType?
 
     public init() {
@@ -126,6 +128,7 @@ public final class Configuration {
         eventProducers = []
         downloader = URLSessionDownloader(responseQueue: cycleQueue)
         bundleConfigurationFilePath = nil
+        configurationDate = NSDate()
 
         //TODO: start event producers
     }
@@ -296,8 +299,7 @@ extension Configuration: InternalEventListener {
 
         configurationMutex.lock()
         configuration = newConfiguration
-        let now = NSDate()
-        configurationDate = now
+        configurationDate = NSDate()
         configurationMutex.unlock()
 
         //Fire delegate events
@@ -308,7 +310,7 @@ extension Configuration: InternalEventListener {
         }
 
         //Let's cache
-        let cacheDate = Cache.Date(now)
+        let cacheDate = Cache.Date(configurationDate)
         let dateData = cacheEncryptor?.encryptedData(cacheDate.data) ?? cacheDate.data
         if differences.count > 0 {
             let cacheConfiguration = Cache.Configuration(configuration)
