@@ -62,7 +62,8 @@ private final class WeakDelegate {
  *  <#Description#>
  */
 public final class Configuration {
-    //private let eventListener = InternalEventListener()
+    /// The fake event listener
+    private let eventListener = ConfigurationEventListener()
 
     /// The lock used to access configuration.
     private let configurationMutex = NSLock()
@@ -130,6 +131,7 @@ public final class Configuration {
         bundleConfigurationFilePath = nil
         configurationDate = NSDate()
 
+        eventListener.realEventListener = self
         //TODO: start event producers
     }
 
