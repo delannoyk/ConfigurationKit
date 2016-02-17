@@ -102,9 +102,6 @@ public final class Configuration {
     /// The downloader used to download a configuration file.
     internal var downloader: Downloader
 
-    /// The initial configuration when no download has previously been made.
-    private let bundleConfigurationFilePath: String?
-
     /// Let's you specify whether an new event should cancel any current request
     /// to be sure you always have the latest version of the configuration.
     public var cancelCurrentRequestWhenEventOccursBeforeEnd = false
@@ -118,21 +115,74 @@ public final class Configuration {
     /// The error that happened at last cycle if any.
     public private(set) var lastCycleError: ErrorType?
 
-    public init() {
-        //TODO: this initializer is just for compilation purpose. We need a correct one.
-        configuration = [:]
-        downloadEncryptor = nil
-        cacheEncryptor = nil
-        cacher = nil
-        urlBuilder = SimpleURLBuilder(URL: NSURL())
-        parser = FlatJSONParser()
-        eventProducers = []
-        downloader = URLSessionDownloader(responseQueue: cycleQueue)
-        bundleConfigurationFilePath = nil
-        configurationDate = NSDate()
 
+    /// The Cache information to use.
+    public typealias CacheInitializer = (Cacher?, Encryptor?)
+
+    /// The Download information to use.
+    public typealias DownloadInitializer = (URLBuilder, Parser, Encryptor?)
+
+
+    /**
+     <#Description#>
+
+     - parameter downloadInitializer:  <#downloadInitializer description#>
+     - parameter cacheInitializer:     <#cacheInitializer description#>
+     - parameter cycleGenerators:      <#cycleGenerators description#>
+     - parameter initialConfiguration: <#initialConfiguration description#>
+
+     - returns: <#return value description#>
+     */
+    public init(downloadInitializer: DownloadInitializer,
+        cacheInitializer: CacheInitializer? = nil,
+        cycleGenerators: [EventProducer],
+        initialConfiguration: [String: String]) {
+            configuration = initialConfiguration
+            downloadEncryptor = downloadInitializer.2
+            cacheEncryptor = cacheInitializer?.1
+            cacher = cacheInitializer?.0
+            urlBuilder = downloadInitializer.0
+            parser = downloadInitializer.1
+            eventProducers = cycleGenerators
+            downloader = URLSessionDownloader(responseQueue: cycleQueue)
+            configurationDate = NSDate()
+
+            commonInit()
+    }
+
+    /**
+     <#Description#>
+
+     - parameter downloadInitializer:          <#downloadInitializer description#>
+     - parameter cacheInitializer:             <#cacheInitializer description#>
+     - parameter cycleGenerators:              <#cycleGenerators description#>
+     - parameter initialConfigurationFilePath: <#initialConfigurationFilePath description#>
+
+     - returns: <#return value description#>
+     */
+    public init(downloadInitializer: DownloadInitializer,
+        cacheInitializer: CacheInitializer? = nil,
+        cycleGenerators: [EventProducer],
+        initialConfigurationFilePath: String) {
+            configuration = [:]//TODO: read the configuration from the file path
+            downloadEncryptor = downloadInitializer.2
+            cacheEncryptor = cacheInitializer?.1
+            cacher = cacheInitializer?.0
+            urlBuilder = downloadInitializer.0
+            parser = downloadInitializer.1
+            eventProducers = cycleGenerators
+            downloader = URLSessionDownloader(responseQueue: cycleQueue)
+            configurationDate = NSDate()//TODO: read the attributes from the file path
+
+            commonInit()
+    }
+
+    /**
+     Performs everything the initializers has in common.
+     */
+    private func commonInit() {
         eventListener.realEventListener = self
-        //TODO: start event producers
+        eventProducers.forEach { $0.eventListener = eventListener }
     }
 
     /**
