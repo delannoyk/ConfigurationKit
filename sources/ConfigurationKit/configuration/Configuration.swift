@@ -124,14 +124,18 @@ public final class Configuration {
 
 
     /**
-     <#Description#>
+     Initializes a `Configuration` with every information needed. This one takes
+     an initial configuration as arguments.
 
-     - parameter downloadInitializer:  <#downloadInitializer description#>
-     - parameter cacheInitializer:     <#cacheInitializer description#>
-     - parameter cycleGenerators:      <#cycleGenerators description#>
-     - parameter initialConfiguration: <#initialConfiguration description#>
+     - parameter downloadInitializer:  The information to use to download file
+         from a remote server.
+     - parameter cacheInitializer:     The information to use to cache downloaded
+         files on the device to always keep the latest version.
+     - parameter cycleGenerators:      The list of event producers that will
+         generate a new refresh cycle.
+     - parameter initialConfiguration: The initial configuration to use.
 
-     - returns: <#return value description#>
+     - returns: An initialized `Configuration`.
      */
     public init(downloadInitializer: DownloadInitializer,
         cacheInitializer: CacheInitializer? = nil,
@@ -151,14 +155,20 @@ public final class Configuration {
     }
 
     /**
-     <#Description#>
+     Initializes a `Configuration` with every information needed. This one takes
+     the path to the initial configuration file.
 
-     - parameter downloadInitializer:          <#downloadInitializer description#>
-     - parameter cacheInitializer:             <#cacheInitializer description#>
-     - parameter cycleGenerators:              <#cycleGenerators description#>
-     - parameter initialConfigurationFilePath: <#initialConfigurationFilePath description#>
+     - parameter downloadInitializer:          The information to use to
+         download file from a remote server.
+     - parameter cacheInitializer:             The information to use to cache
+         downloaded files on the device to always keep the latest version.
+     - parameter cycleGenerators:              The list of event producers that
+         will generate a new refresh cycle.
+     - parameter initialConfigurationFilePath: The path to the initial
+         configuration file. It will be treated as a remote file (decrypted and
+         parsed).
 
-     - returns: <#return value description#>
+     - returns: An initialized `Configuration`.
      */
     public init(downloadInitializer: DownloadInitializer,
         cacheInitializer: CacheInitializer? = nil,
