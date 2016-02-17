@@ -104,7 +104,7 @@ public final class Configuration {
 
     /// Let's you specify whether an new event should cancel any current request
     /// to be sure you always have the latest version of the configuration.
-    public var cancelCurrentRequestWhenEventOccursBeforeEnd = false
+    public var cancelCurrentRequestWhenEventOccursBeforeEnd: Bool
 
     /// The date of the last refresh of configuration.
     public private(set) var configurationDate: NSDate
@@ -133,6 +133,8 @@ public final class Configuration {
          files on the device to always keep the latest version.
      - parameter cycleGenerators:      The list of event producers that will
          generate a new refresh cycle.
+     - parameter cancelCurrentRequestWhenEventOccursBeforeEnd: States if a new
+         event should cancel any current refresh request or be dropped.
      - parameter initialConfiguration: The initial configuration to use.
 
      - returns: An initialized `Configuration`.
@@ -140,6 +142,7 @@ public final class Configuration {
     public init(downloadInitializer: DownloadInitializer,
         cacheInitializer: CacheInitializer? = nil,
         cycleGenerators: [EventProducer],
+        cancelCurrentRequestWhenEventOccursBeforeEnd: Bool = false,
         initialConfiguration: [String: String]) {
             configuration = initialConfiguration
             downloadEncryptor = downloadInitializer.2
@@ -149,6 +152,7 @@ public final class Configuration {
             parser = downloadInitializer.1
             eventProducers = cycleGenerators
             downloader = URLSessionDownloader(responseQueue: cycleQueue)
+            self.cancelCurrentRequestWhenEventOccursBeforeEnd = cancelCurrentRequestWhenEventOccursBeforeEnd
             configurationDate = NSDate()
 
             commonInit()
@@ -164,6 +168,8 @@ public final class Configuration {
          downloaded files on the device to always keep the latest version.
      - parameter cycleGenerators:              The list of event producers that
          will generate a new refresh cycle.
+     - parameter cancelCurrentRequestWhenEventOccursBeforeEnd: States if a
+         new event should cancel any current refresh request or be dropped.
      - parameter initialConfigurationFilePath: The path to the initial
          configuration file. It will be treated as a remote file (decrypted and
          parsed).
@@ -173,6 +179,7 @@ public final class Configuration {
     public init(downloadInitializer: DownloadInitializer,
         cacheInitializer: CacheInitializer? = nil,
         cycleGenerators: [EventProducer],
+        cancelCurrentRequestWhenEventOccursBeforeEnd: Bool = false,
         initialConfigurationFilePath: String) {
             configuration = [:]//TODO: read the configuration from the file path
             downloadEncryptor = downloadInitializer.2
@@ -182,6 +189,7 @@ public final class Configuration {
             parser = downloadInitializer.1
             eventProducers = cycleGenerators
             downloader = URLSessionDownloader(responseQueue: cycleQueue)
+            self.cancelCurrentRequestWhenEventOccursBeforeEnd = cancelCurrentRequestWhenEventOccursBeforeEnd
             configurationDate = NSDate()//TODO: read the attributes from the file path
 
             commonInit()
@@ -192,7 +200,10 @@ public final class Configuration {
      */
     private func commonInit() {
         eventListener.realEventListener = self
-        eventProducers.forEach { $0.eventListener = eventListener }
+        eventProducers.forEach {
+            $0.eventListener = eventListener
+            $0.startProducingEvents()
+        }
     }
 
     /**
