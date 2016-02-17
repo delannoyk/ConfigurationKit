@@ -14,6 +14,9 @@
 		460743201C6BDD15001AE5A6 /* FileCacher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4607431F1C6BDD15001AE5A6 /* FileCacher.swift */; };
 		460743421C707B83001AE5A6 /* FileCacher_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460743411C707B83001AE5A6 /* FileCacher_TestCase.swift */; };
 		460743441C722F25001AE5A6 /* InternalEventListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460743431C722F24001AE5A6 /* InternalEventListener.swift */; };
+		460743481C74F3C5001AE5A6 /* ApplicationEventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460743451C74F3C5001AE5A6 /* ApplicationEventProducer.swift */; };
+		460743491C74F3C5001AE5A6 /* StopWatchEventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460743461C74F3C5001AE5A6 /* StopWatchEventProducer.swift */; };
+		4607434A1C74F3C5001AE5A6 /* TimedEventProducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460743471C74F3C5001AE5A6 /* TimedEventProducer.swift */; };
 		460FA82A1B63A6AA00BBE0EE /* RemoteConfigurationFlatJSONParser_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460FA8291B63A6AA00BBE0EE /* RemoteConfigurationFlatJSONParser_TestCase.swift */; };
 		460FA82C1B63A6B700BBE0EE /* RemoteConfigurationPListParser_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460FA82B1B63A6B700BBE0EE /* RemoteConfigurationPListParser_TestCase.swift */; };
 		4613B59F1A3E0FD2001DB168 /* ConfigurationKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4613B5931A3E0FD2001DB168 /* ConfigurationKit.framework */; };
@@ -49,6 +52,9 @@
 		4607431F1C6BDD15001AE5A6 /* FileCacher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileCacher.swift; sourceTree = "<group>"; };
 		460743411C707B83001AE5A6 /* FileCacher_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileCacher_TestCase.swift; sourceTree = "<group>"; };
 		460743431C722F24001AE5A6 /* InternalEventListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InternalEventListener.swift; sourceTree = "<group>"; };
+		460743451C74F3C5001AE5A6 /* ApplicationEventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplicationEventProducer.swift; sourceTree = "<group>"; };
+		460743461C74F3C5001AE5A6 /* StopWatchEventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StopWatchEventProducer.swift; sourceTree = "<group>"; };
+		460743471C74F3C5001AE5A6 /* TimedEventProducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimedEventProducer.swift; sourceTree = "<group>"; };
 		460FA8291B63A6AA00BBE0EE /* RemoteConfigurationFlatJSONParser_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationFlatJSONParser_TestCase.swift; sourceTree = "<group>"; };
 		460FA82B1B63A6B700BBE0EE /* RemoteConfigurationPListParser_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationPListParser_TestCase.swift; sourceTree = "<group>"; };
 		4613B5931A3E0FD2001DB168 /* ConfigurationKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ConfigurationKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,6 +106,9 @@
 			isa = PBXGroup;
 			children = (
 				460743161C6BD94D001AE5A6 /* EventProducer.swift */,
+				460743451C74F3C5001AE5A6 /* ApplicationEventProducer.swift */,
+				460743461C74F3C5001AE5A6 /* StopWatchEventProducer.swift */,
+				460743471C74F3C5001AE5A6 /* TimedEventProducer.swift */,
 			);
 			path = event;
 			sourceTree = "<group>";
@@ -392,6 +401,7 @@
 				4613B5BC1A3E15B5001DB168 /* URLBuilder.swift in Sources */,
 				4613B5C61A3E1F85001DB168 /* Parser.swift in Sources */,
 				460743111C6BAC8E001AE5A6 /* Encryptor.swift in Sources */,
+				460743481C74F3C5001AE5A6 /* ApplicationEventProducer.swift in Sources */,
 				46F655801C6A10440000C0D7 /* DictionaryExtension.swift in Sources */,
 				4613B5C31A3E1F10001DB168 /* Downloader.swift in Sources */,
 				4613B5BA1A3E15B5001DB168 /* Configuration.swift in Sources */,
@@ -400,6 +410,8 @@
 				4607431E1C6BDBAF001AE5A6 /* PListParser.swift in Sources */,
 				46C19CD31AC845AD0023537A /* Cacher.swift in Sources */,
 				460743201C6BDD15001AE5A6 /* FileCacher.swift in Sources */,
+				4607434A1C74F3C5001AE5A6 /* TimedEventProducer.swift in Sources */,
+				460743491C74F3C5001AE5A6 /* StopWatchEventProducer.swift in Sources */,
 				460743441C722F25001AE5A6 /* InternalEventListener.swift in Sources */,
 				460743171C6BD94D001AE5A6 /* EventProducer.swift in Sources */,
 			);
