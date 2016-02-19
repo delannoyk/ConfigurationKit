@@ -23,6 +23,8 @@ class DictionaryExtension_TestCase: XCTestCase {
         //Testing changes
         diff.forEach {
             XCTAssert($0.isChange)
+            XCTAssert(!$0.isAddition)
+            XCTAssert(!$0.isRemoval)
             XCTAssert($0.oldValue == d1[$0.key])
             XCTAssert($0.newValue == d2[$0.key])
             XCTAssert($0.oldValue == $0.newValue?.lowercaseString)
@@ -42,6 +44,8 @@ class DictionaryExtension_TestCase: XCTestCase {
         //Testing changes
         diff.forEach {
             XCTAssert($0.isAddition)
+            XCTAssert(!$0.isChange)
+            XCTAssert(!$0.isRemoval)
             XCTAssert($0.oldValue == nil)
             XCTAssert($0.newValue == d2[$0.key])
         }
@@ -60,6 +64,8 @@ class DictionaryExtension_TestCase: XCTestCase {
         //Testing changes
         diff.forEach {
             XCTAssert($0.isRemoval)
+            XCTAssert(!$0.isAddition)
+            XCTAssert(!$0.isChange)
             XCTAssert($0.oldValue == d1[$0.key])
             XCTAssert($0.newValue == nil)
         }
