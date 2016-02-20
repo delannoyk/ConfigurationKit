@@ -24,6 +24,13 @@
         public weak var eventListener: EventListener?
 
         /**
+         Stops producing events on deinit.
+         */
+        deinit {
+            stopProducingEvents()
+        }
+
+        /**
          Listens to application notifications and generates events each time 
          one of these notification gets fired.
          */
