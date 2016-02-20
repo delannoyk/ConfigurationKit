@@ -9,22 +9,6 @@
 import Foundation
 
 /**
- *  A `WeakTarget` is used so that a NSTimer doesn't retain the real target
- *  and the real target can invalidate the timer in its deinit.
- */
-private class WeakTarget: NSObject {
-    weak var target: StopWatchEventProducer?
-
-    init(_ target: StopWatchEventProducer) {
-        self.target = target
-    }
-
-    @objc func selector(timer: NSTimer) {
-        target?.timerTicked(timer)
-    }
-}
-
-/**
  *  A `StopWatchEventProducer` generates events at regular interval.
  */
 public class StopWatchEventProducer: NSObject, EventProducer {
@@ -55,6 +39,7 @@ public class StopWatchEventProducer: NSObject, EventProducer {
      */
     public init(timeInterval: NSTimeInterval) {
         self.timeInterval = timeInterval
+        super.init()
     }
 
     /**
@@ -91,13 +76,15 @@ public class StopWatchEventProducer: NSObject, EventProducer {
         timer.invalidate()
         self.timer = nil
     }
+}
 
+extension StopWatchEventProducer: WeakTargetDelegate {
     /**
      Method that gets called when the timer ticks.
 
-     - parameter timer: The timer.
+     - parameter target: The weak target.
      */
-    private func timerTicked(timer: NSTimer) {
+    func selectorCalledOnWeakTarget(target: WeakTarget) {
         eventListener?.onEvent()
     }
 }
