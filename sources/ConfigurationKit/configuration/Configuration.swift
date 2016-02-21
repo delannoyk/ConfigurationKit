@@ -9,21 +9,20 @@
 import Foundation
 
 /**
- *  Implementing this protocol makes your class eligible to Configuration alerts
- *  about cycles and changes.
+ *  Implementing this protocol makes your class eligible to Configuration alerts about cycles and
+ *  changes.
  */
 public protocol ConfigurationDelegate: class {
     /**
-     Lets you know that the configuration will begin a new cycle because an
-     EventProducer fired.
+     Lets you know that the configuration will begin a new cycle because an EventProducer fired.
 
      - parameter configuration: The configuration.
      */
     func configurationWillBeginCycle(configuration: Configuration)
 
     /**
-     Alerts that the configuration found a change after downloading and parsing
-     a new configuration file.
+     Alerts that the configuration found a change after downloading and parsing a new configuration
+     file.
 
      - parameter configuration: The configuration.
      - parameter change:        The change that has been detected.
@@ -93,15 +92,14 @@ public final class Configuration {
     /// The parser used to parse a configuration file.
     private let parser: Parser
 
-    /// The list of event producers that generate events when a new cycle
-    /// should be started.
+    /// The list of event producers that generate events when a new cycle should be started.
     private let eventProducers: [EventProducer]
 
     /// The downloader used to download a configuration file.
     internal var downloader: Downloader
 
-    /// Let's you specify whether an new event should cancel any current request
-    /// to be sure you always have the latest version of the configuration.
+    /// Let's you specify whether an new event should cancel any current request to be sure you
+    /// always have the latest version of the configuration.
     public var newEventCancelCurrentOne: Bool
 
     /// The date of the last refresh of configuration.
@@ -122,17 +120,16 @@ public final class Configuration {
 
 
     /**
-     Initializes a `Configuration` with every information needed. This one takes
-     an initial configuration as arguments.
+     Initializes a `Configuration` with every information needed. This one takes an initial
+     configuration as arguments.
 
-     - parameter downloadInitializer:  The information to use to download file
-         from a remote server.
-     - parameter cacheInitializer:     The information to use to cache downloaded
-         files on the device to always keep the latest version.
-     - parameter cycleGenerators:      The list of event producers that will
-         generate a new refresh cycle.
-     - parameter newEventCancelCurrentOne: States if a new
-         event should cancel any current refresh request or be dropped.
+     - parameter downloadInitializer:  The information to use to download file from a remote server.
+     - parameter cacheInitializer:     The information to use to cache downloaded files on the
+         device to always keep the latest version.
+     - parameter cycleGenerators:      The list of event producers that will generate a new refresh
+         cycle.
+     - parameter newEventCancelCurrentOne: States if a new event should cancel any current refresh
+         request or be dropped.
      - parameter initialConfiguration: The initial configuration to use.
      */
     public init(downloadInitializer: DownloadInitializer,
@@ -158,17 +155,16 @@ public final class Configuration {
      Initializes a `Configuration` with every information needed. This one takes
      the path to the initial configuration file.
 
-     - parameter downloadInitializer:          The information to use to
-         download file from a remote server.
-     - parameter cacheInitializer:             The information to use to cache
-         downloaded files on the device to always keep the latest version.
-     - parameter cycleGenerators:              The list of event producers that
-         will generate a new refresh cycle.
-     - parameter newEventCancelCurrentOne: States if a
-         new event should cancel any current refresh request or be dropped.
-     - parameter initialConfigurationFilePath: The path to the initial
-         configuration file. It will be treated as a remote file (decrypted and
-         parsed).
+     - parameter downloadInitializer:          The information to use to download file from a remote
+         server.
+     - parameter cacheInitializer:             The information to use to cache downloaded files on
+         the device to always keep the latest version.
+     - parameter cycleGenerators:              The list of event producers that will generate a new
+         refresh cycle.
+     - parameter newEventCancelCurrentOne:     States if a new event should cancel any current
+         refresh request or be dropped.
+     - parameter initialConfigurationFilePath: The path to the initial configuration file. It will
+         be treated as a remote file (decrypted and parsed).
      */
     public init(downloadInitializer: DownloadInitializer,
         cacheInitializer: CacheInitializer? = nil,
@@ -193,6 +189,22 @@ public final class Configuration {
      Performs everything the initializers has in common.
      */
     private func commonInit() {
+        //Initializing from cache if possible
+        if let confData = cacher?.dataAtKey(Cache.Configuration.key) {
+            let data = cacheEncryptor?.decryptedData(confData) ?? confData
+            if let cached = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? [String: String] {
+                    configuration = cached
+            }
+        }
+
+        if let dateData = cacher?.dataAtKey(Cache.Date.key) {
+            let data = cacheEncryptor?.decryptedData(dateData) ?? dateData
+            if let cached = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? NSDate {
+                    configurationDate = cached
+            }
+        }
+
+        //Configuring eventProducers
         eventListener.realEventListener = self
         eventProducers.forEach {
             $0.eventListener = eventListener
@@ -210,9 +222,9 @@ public final class Configuration {
         }
     }
 
+
     /**
-     Returns The value associated with `key`, or nil if no value
-     is associated with `key`.
+     Returns The value associated with `key`, or nil if no value is associated with `key`.
 
      - parameter key: The key for which to return the corresponding value.
 
@@ -223,30 +235,6 @@ public final class Configuration {
         let value = configuration[key]
         configurationMutex.unlock()
         return value
-    }
-
-    /**
-     Returns The value associated with `key`, or nil if no value
-     is associated with `key`.
-
-     - parameter key: The key for which to return the corresponding value.
-
-     - returns: The value associated with `key`, or nil if no value is associated with `key`.
-     */
-    public func stringForKey(key: String) -> String? {
-        return self[key]
-    }
-
-    /**
-     Returns The value associated with `key`, or nil if no value
-     is associated with `key`.
-
-     - parameter key: The key for which to return the corresponding value.
-
-     - returns: The value associated with `key`, or nil if no value is associated with `key`.
-     */
-    public func objectForKey(key: String) -> String? {
-        return self[key]
     }
 
 
@@ -278,8 +266,8 @@ public final class Configuration {
      - Date:          The last successful configuration refresh date.
      */
     private enum Cache {
-        case Configuration([String: String])
-        case Date(NSDate)
+        case Configuration
+        case Date
 
         /// The key for the data to be cached at.
         var key: String {
@@ -290,23 +278,12 @@ public final class Configuration {
                 return "date"
             }
         }
-
-        /// The data to cache.
-        var data: NSData {
-            switch self {
-            case .Configuration(let configuration):
-                return NSKeyedArchiver.archivedDataWithRootObject(configuration)
-            case .Date(let date):
-                return NSKeyedArchiver.archivedDataWithRootObject(date)
-            }
-        }
     }
 }
 
 extension Configuration: InternalEventListener {
     /**
-     Called upon event. This will generate a new cycle if possible and
-     handle everything.
+     Called upon event. This will generate a new cycle if possible and handle everything.
      */
     func onEvent() {
         guard !downloader.hasPendingRequest || newEventCancelCurrentOne else {
@@ -334,7 +311,7 @@ extension Configuration: InternalEventListener {
                         self?.handleError(error)
                     } else {
                         //We didn't have any data nor error.
-                        //TODO: how do Configuration reacts to this?
+                        //Nothing changes then...
                     }
 
                     if let strongSelf = self {
@@ -376,16 +353,14 @@ extension Configuration: InternalEventListener {
         }
 
         //Let's cache
-        let cacheDate = Cache.Date(configurationDate)
-        let dateData = cacheEncryptor?.encryptedData(cacheDate.data)
-            ?? cacheDate.data
+        let data = NSKeyedArchiver.archivedDataWithRootObject(configurationDate)
+        let dateData = cacheEncryptor?.encryptedData(data) ?? data
 
         if differences.count > 0 {
-            let cacheConfiguration = Cache.Configuration(configuration)
-            let data = cacheEncryptor?.encryptedData(cacheConfiguration.data) ??
-                cacheConfiguration.data
+            let data = NSKeyedArchiver.archivedDataWithRootObject(configuration)
+            let configurationData = cacheEncryptor?.encryptedData(data) ?? data
 
-            try cacher?.storeData(data, atKey: "configuration")
+            try cacher?.storeData(configurationData, atKey: "configuration")
         }
         try cacher?.storeData(dateData, atKey: "configuration_date")
 

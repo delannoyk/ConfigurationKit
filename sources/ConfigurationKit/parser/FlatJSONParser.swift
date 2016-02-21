@@ -22,8 +22,8 @@ public enum FlatJSONParsingError: ErrorType {
  */
 public struct FlatJSONParser: Parser {
     /**
-     Parse data into a Dictionary where Key: String, Value: String.
-     The result of this parsing should be a valid configuration.
+     Parse data into a Dictionary where Key: String, Value: String. The result of this parsing
+     should be a valid configuration.
 
      - parameter data: The data to parse.
 

@@ -9,17 +9,15 @@
 import Foundation
 
 /**
- *  A `Downloader` has the responsability to download data from a given
- *  `NSURLRequest`.
+ *  A `Downloader` has the responsability to download data from a given `NSURLRequest`.
  */
 protocol Downloader {
-    /// A boolean value indicating whether the `Downloader` already has a
-    /// pending request that hasn't been fulfilled yet.
+    /// A boolean value indicating whether the `Downloader` already has a pending request that
+    /// hasn't been fulfilled yet.
     var hasPendingRequest: Bool { get }
 
     /**
-     Downloads data from an `NSURLRequest` and calls the completion back
-     when data is ready.
+     Downloads data from an `NSURLRequest` and calls the completion back when data is ready.
 
      - parameter request:    The request to download data from.
      - parameter completion: The completion to call when data is ready.
@@ -28,8 +26,7 @@ protocol Downloader {
 }
 
 /**
- *  An `URLSessionDownloader` is an implementation of a Downloader based
- *  on `NSURLSession`.
+ *  An `URLSessionDownloader` is an implementation of a Downloader based on `NSURLSession`.
  */
 class URLSessionDownloader: Downloader {
     /**
@@ -64,18 +61,17 @@ class URLSessionDownloader: Downloader {
         self.responseQueue = responseQueue
     }
 
-    /// A boolean value indicating whether the `Downloader` already has a
-    /// pending request that hasn't been fulfilled yet.
+    /// A boolean value indicating whether the `Downloader` already has a pending request that
+    /// hasn't been fulfilled yet.
     var hasPendingRequest: Bool {
         return currentTask != nil
     }
 
     /**
-     Downloads data from an `NSURLRequest` and calls the completion back
-     when data is ready.
+     Downloads data from an `NSURLRequest` and calls the completion back when data is ready.
 
-     - note: If another request is currently being performed, it will be cancelled
-        and a new one will start.
+     - note: If another request is currently being performed, it will be cancelled and a new one
+         will start.
 
      - parameter request:    The request to download data from.
      - parameter completion: The completion to call when data is ready.

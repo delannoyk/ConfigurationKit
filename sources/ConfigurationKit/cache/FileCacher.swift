@@ -69,13 +69,12 @@ public struct FileCacher: Cacher {
     /**
      Initializes a `FileCacher` with a specific path to store files at.
 
-     - parameter path:        The path to store files at. To ensure no files get
-     corrupted in the caching process, give a location in which only
-     Configuration files will be saved.
-     - parameter options:     The options with which the files saved.
+     - parameter path:    The path to store files at. To ensure no files get corrupted in the
+         caching process, give a location in which only `Configuration` files will be saved.
+     - parameter options: The options with which the files saved.
 
-     - throws: Throws an error if given path exists and isn't a directory or if
-     directory creation fails.
+     - throws: Throws an error if given path exists and isn't a directory or if directory creation
+         fails.
      */
     public init(path: String, options: FileCachingOptions) throws {
         try self.init(path: path, options: options, fileManager: NSFileManager.defaultManager())
@@ -84,14 +83,13 @@ public struct FileCacher: Cacher {
     /**
      Initializes a `FileCacher` with a specific path to store files at.
 
-     - parameter path:        The path to store files at. To ensure no files get
-         corrupted in the caching process, give a location in which only
-         Configuration files will be saved.
+     - parameter path:        The path to store files at. To ensure no files get corrupted in the
+         caching process, give a location in which only Configuration files will be saved.
      - parameter options:     The options with which the files saved.
      - parameter fileManager: The file manager.
 
-     - throws: Throws an error if given path exists and isn't a directory or if
-     directory creation fails.
+     - throws: Throws an error if given path exists and isn't a directory or if directory creation
+         fails.
      */
     internal init(path: String, options: FileCachingOptions, fileManager: FileManager) throws {
         self.path = path

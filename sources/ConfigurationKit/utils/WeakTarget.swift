@@ -19,8 +19,8 @@ protocol WeakTargetDelegate: class {
 }
 
 /**
- *  A `WeakTarget` is used so that a NSTimer doesn't retain the real target
- *  and the real target can invalidate the timer in its deinit.
+ *  A `WeakTarget` is used so that a NSTimer doesn't retain the real target and the real target can
+ *  invalidate the timer in its deinit.
  */
 class WeakTarget: NSObject {
     /// The real target.

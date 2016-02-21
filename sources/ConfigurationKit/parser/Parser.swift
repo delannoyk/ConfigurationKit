@@ -9,13 +9,13 @@
 import Foundation
 
 /**
- *  A `Parser` transforms NSData fetched from the URLRequest returned by the
- *  `URLBuilder` into a configuration.
+ *  A `Parser` transforms NSData fetched from the URLRequest returned by the `URLBuilder` into a
+ *  configuration.
  */
 public protocol Parser {
     /**
-     Parse data into a Dictionary where Key: String, Value: String.
-     The result of this parsing should be a valid configuration.
+     Parse data into a Dictionary where Key: String, Value: String. The result of this parsing
+     should be a valid configuration.
 
      - parameter data: The data to parse.
 

@@ -19,8 +19,8 @@ public protocol EventListener: class {
 }
 
 /**
- *  An `EventProducer` serves the purpose of producing events that
- *  will generate a new download cycle of the configuration.
+ *  An `EventProducer` serves the purpose of producing events that will generate a new download
+ *  cycle of the configuration.
  */
 public protocol EventProducer: class {
     /// The listener that will be alerted a new event occured.

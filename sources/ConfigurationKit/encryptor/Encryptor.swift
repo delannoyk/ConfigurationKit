@@ -22,8 +22,8 @@ public protocol Encryptor {
     func encryptedData(data: NSData) -> NSData
 
     /**
-     This should decrypt data using the algorithm you want (fitting your
-     `encryptData:` implementation).
+     This should decrypt data using the algorithm you want (fitting your `encryptData:`
+     implementation).
 
      - parameter data: Data to decrypt.
 

@@ -13,12 +13,11 @@
     import UIKit
 
     /**
-     *  A `EventProducer` that listens to when application enters in foreground
-     *  and generates an event from that.
+     *  A `EventProducer` that listens to when application enters in foreground and generates an
+     *  event from that.
      */
     public class ApplicationEventProducer: NSObject, EventProducer {
-        /// A boolean value indicating whether we're already generating events
-        /// or not.
+        /// A boolean value indicating whether we're already generating events or not.
         private var started = false
 
         /// The event listener.
@@ -32,8 +31,8 @@
         }
 
         /**
-         Listens to application notifications and generates events each time
-         one of these notification gets fired.
+         Listens to application notifications and generates events each time one of these
+         notification gets fired.
          */
         public func startProducingEvents() {
             guard !started else {
@@ -62,8 +61,7 @@
         }
 
         /**
-         Method that gets called when `UIApplicationWillEnterForegroundNotification`
-         is fired.
+         Method that gets called when `UIApplicationWillEnterForegroundNotification` is fired.
 
          - parameter note: The notification.
          */

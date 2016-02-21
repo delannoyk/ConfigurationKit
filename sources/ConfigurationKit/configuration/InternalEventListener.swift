@@ -9,9 +9,8 @@
 import Foundation
 
 /**
- *  This protocol is a copy of `EventListener` except that
- *  it isn't public. It allows `Configuration` to implement it
- *  internally and doesn't show publicly the implementation.
+ *  This protocol is a copy of `EventListener` except that it isn't public. It allows
+ *  `Configuration` to implement it internally and doesn't show publicly the implementation.
  */
 internal protocol InternalEventListener: class {
     /**
@@ -21,9 +20,8 @@ internal protocol InternalEventListener: class {
 }
 
 /**
- *  `ConfigurationEventListener` is an internal implementation
- *  of `EventListener` so that we don't have to make the implementation
- *  public.
+ *  `ConfigurationEventListener` is an internal implementation of `EventListener` so that we don't
+ *  have to make the implementation public.
  */
 internal class ConfigurationEventListener: EventListener {
     /// The real event listener

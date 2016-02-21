@@ -9,8 +9,8 @@
 import Foundation
 
 /**
- *  A `SimpleURLBuilder` is an URLBuilder implementation that uses a static URL
- *  to download periodically a configuration file.
+ *  A `SimpleURLBuilder` is an URLBuilder implementation that uses a static URL to download
+ *  periodically a configuration file.
  */
 public struct SimpleURLBuilder: URLBuilder {
     /// The URLRequest.
