@@ -74,4 +74,29 @@ class StopWatchEventProducer_TestCase: XCTestCase {
         waitForExpectationsWithTimeout(1) { error in
         }
     }
+
+    func testReplacingTimeInterval() {
+        let listener = E()
+
+        let producer = StopWatchEventProducer(timeInterval: 0.2)
+        producer.eventListener = listener
+        producer.startProducingEvents()
+
+        let date = NSDate()
+
+        //Ok, same thing but we stop producing events
+        let expectation = expectationWithDescription("Waiting for the timer to fire")
+        listener.onEventClosure = {
+            XCTAssert(date.timeIntervalSinceNow < -1 && date.timeIntervalSinceNow > -1.2)
+            expectation.fulfill()
+        }
+
+        producer.timeInterval = 1
+
+        waitForExpectationsWithTimeout(2) { error in
+            if let _ = error {
+                XCTFail()
+            }
+        }
+    }
 }
