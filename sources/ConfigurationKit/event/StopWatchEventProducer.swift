@@ -34,8 +34,6 @@ public class StopWatchEventProducer: NSObject, EventProducer {
 
      - parameter timeInterval: The time interval to wait before generating new
          events.
-
-     - returns: An initialized `StopWatchEventProducer`.
      */
     public init(timeInterval: NSTimeInterval) {
         self.timeInterval = timeInterval

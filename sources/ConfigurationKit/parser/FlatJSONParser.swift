@@ -27,12 +27,15 @@ public struct FlatJSONParser: Parser {
 
      - parameter data: The data to parse.
 
-     - throws: Throws an error if parsing fails.
+     - throws: An error if parsing fails.
 
      - returns: A valid configuration.
      */
     public func parseData(data: NSData) throws -> [String: String] {
-        if let JSONObject = try NSJSONSerialization.JSONObjectWithData(data, options: []) as? [String: String] {
+        let JSONObject = try NSJSONSerialization.JSONObjectWithData(data,
+            options: [])
+
+        if let JSONObject = JSONObject as? [String: String] {
             return JSONObject
         }
         throw FlatJSONParsingError.JSONIsNotFlatDictionaryOfStrings

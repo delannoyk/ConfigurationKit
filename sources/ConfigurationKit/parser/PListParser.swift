@@ -27,12 +27,16 @@ public struct PListParser: Parser {
 
      - parameter data: The data to parse.
 
-     - throws: Throws an error if parsing fails.
+     - throws: An error if parsing fails.
 
      - returns: A valid configuration.
      */
     public func parseData(data: NSData) throws -> [String: String] {
-        if let dictionary = try NSPropertyListSerialization.propertyListWithData(data, options: [], format: nil) as? [String: String] {
+        let plist = try NSPropertyListSerialization.propertyListWithData(data,
+            options: [],
+            format: nil)
+
+        if let dictionary = plist as? [String: String] {
             return dictionary
         }
         throw PListParsingError.PListIsNotValidDictionary

@@ -21,7 +21,9 @@ public enum FileCacherError: ErrorType {
  *  The FileManager. It exposes everything so that NSFileManager can be mocked.
  */
 internal protocol FileManager {
-    func createDirectoryAtPath(path: String, withIntermediateDirectories createIntermediates: Bool, attributes: [String : AnyObject]?) throws
+    func createDirectoryAtPath(path: String,
+        withIntermediateDirectories createIntermediates: Bool,
+        attributes: [String : AnyObject]?) throws
     func fileExistsAtPath(path: String, isDirectory: UnsafeMutablePointer<ObjCBool>) -> Bool
     func removeItemAtURL(URL: NSURL) throws
 }
@@ -39,8 +41,6 @@ public struct FileCachingOptions: OptionSetType {
      Initializes a `FileCachingOptions` from a raw value.
 
      - parameter rawValue: The raw value.
-
-     - returns: An initialized a `FileCachingOptions`.
      */
     public init(rawValue: UInt) {
         self.rawValue = rawValue
@@ -76,8 +76,6 @@ public struct FileCacher: Cacher {
 
      - throws: Throws an error if given path exists and isn't a directory or if
      directory creation fails.
-
-     - returns: An initialized `FileCacher`.
      */
     public init(path: String, options: FileCachingOptions) throws {
         try self.init(path: path, options: options, fileManager: NSFileManager.defaultManager())
@@ -94,8 +92,6 @@ public struct FileCacher: Cacher {
 
      - throws: Throws an error if given path exists and isn't a directory or if
      directory creation fails.
-
-     - returns: An initialized `FileCacher`.
      */
     internal init(path: String, options: FileCachingOptions, fileManager: FileManager) throws {
         self.path = path
@@ -109,8 +105,7 @@ public struct FileCacher: Cacher {
             if !isDirectory.boolValue {
                 throw FileCacherError.PathExistsAndIsNotDirectory
             }
-        }
-        else {
+        } else {
             //Let's create the directory
             try fileManager.createDirectoryAtPath(path,
                 withIntermediateDirectories: true,

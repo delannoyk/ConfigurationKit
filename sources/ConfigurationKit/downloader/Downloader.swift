@@ -58,8 +58,6 @@ class URLSessionDownloader: Downloader {
 
      - parameter session:       The session to use.
      - parameter responseQueue: The response queue.
-
-     - returns: An initialized `URLSessionDownloader`.
      */
     init(session: NSURLSession = NSURLSession.sharedSession(), responseQueue: dispatch_queue_t) {
         self.session = session
@@ -75,7 +73,7 @@ class URLSessionDownloader: Downloader {
     /**
      Downloads data from an `NSURLRequest` and calls the completion back
      when data is ready.
-     
+
      - note: If another request is currently being performed, it will be cancelled
         and a new one will start.
 

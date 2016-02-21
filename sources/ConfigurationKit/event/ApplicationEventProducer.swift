@@ -6,7 +6,8 @@
 //  Copyright © 2016 Kevin Delannoy. All rights reserved.
 //
 
-//FIXME: I'm looking for a better way to express that it isn't available on watchOS. maybe @unavailable?
+//FIXME: I'm looking for a better way to express that it isn't available on
+//watchOS. maybe @unavailable?
 #if os(tvOS) || os(iOS) || os(OSX)
 
     import UIKit
@@ -31,7 +32,7 @@
         }
 
         /**
-         Listens to application notifications and generates events each time 
+         Listens to application notifications and generates events each time
          one of these notification gets fired.
          */
         public func startProducingEvents() {
@@ -70,5 +71,5 @@
             eventListener?.onEvent()
         }
     }
-    
+
 #endif

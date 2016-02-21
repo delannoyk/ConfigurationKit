@@ -50,8 +50,6 @@ private final class WeakDelegate {
      Initializes a new `WeakDelegate` from a delegate.
 
      - parameter delegate: The delegate.
-
-     - returns: An initialized `WeakDelegate`.
      */
     init(_ delegate: ConfigurationDelegate) {
         self.delegate = delegate
@@ -104,7 +102,7 @@ public final class Configuration {
 
     /// Let's you specify whether an new event should cancel any current request
     /// to be sure you always have the latest version of the configuration.
-    public var cancelCurrentRequestWhenEventOccursBeforeEnd: Bool
+    public var newEventCancelCurrentOne: Bool
 
     /// The date of the last refresh of configuration.
     public private(set) var configurationDate: NSDate
@@ -133,16 +131,14 @@ public final class Configuration {
          files on the device to always keep the latest version.
      - parameter cycleGenerators:      The list of event producers that will
          generate a new refresh cycle.
-     - parameter cancelCurrentRequestWhenEventOccursBeforeEnd: States if a new
+     - parameter newEventCancelCurrentOne: States if a new
          event should cancel any current refresh request or be dropped.
      - parameter initialConfiguration: The initial configuration to use.
-
-     - returns: An initialized `Configuration`.
      */
     public init(downloadInitializer: DownloadInitializer,
         cacheInitializer: CacheInitializer? = nil,
         cycleGenerators: [EventProducer],
-        cancelCurrentRequestWhenEventOccursBeforeEnd: Bool = false,
+        newEventCancelCurrentOne: Bool = false,
         initialConfiguration: [String: String]) {
             configuration = initialConfiguration
             downloadEncryptor = downloadInitializer.2
@@ -152,7 +148,7 @@ public final class Configuration {
             parser = downloadInitializer.1
             eventProducers = cycleGenerators
             downloader = URLSessionDownloader(responseQueue: cycleQueue)
-            self.cancelCurrentRequestWhenEventOccursBeforeEnd = cancelCurrentRequestWhenEventOccursBeforeEnd
+            self.newEventCancelCurrentOne = newEventCancelCurrentOne
             configurationDate = NSDate()
 
             commonInit()
@@ -168,18 +164,16 @@ public final class Configuration {
          downloaded files on the device to always keep the latest version.
      - parameter cycleGenerators:              The list of event producers that
          will generate a new refresh cycle.
-     - parameter cancelCurrentRequestWhenEventOccursBeforeEnd: States if a
+     - parameter newEventCancelCurrentOne: States if a
          new event should cancel any current refresh request or be dropped.
      - parameter initialConfigurationFilePath: The path to the initial
          configuration file. It will be treated as a remote file (decrypted and
          parsed).
-
-     - returns: An initialized `Configuration`.
      */
     public init(downloadInitializer: DownloadInitializer,
         cacheInitializer: CacheInitializer? = nil,
         cycleGenerators: [EventProducer],
-        cancelCurrentRequestWhenEventOccursBeforeEnd: Bool = false,
+        newEventCancelCurrentOne: Bool = false,
         initialConfigurationFilePath: String) {
             configuration = [:]//TODO: read the configuration from the file path
             downloadEncryptor = downloadInitializer.2
@@ -189,7 +183,7 @@ public final class Configuration {
             parser = downloadInitializer.1
             eventProducers = cycleGenerators
             downloader = URLSessionDownloader(responseQueue: cycleQueue)
-            self.cancelCurrentRequestWhenEventOccursBeforeEnd = cancelCurrentRequestWhenEventOccursBeforeEnd
+            self.newEventCancelCurrentOne = newEventCancelCurrentOne
             configurationDate = NSDate()//TODO: read the attributes from the file path
 
             commonInit()
@@ -315,7 +309,7 @@ extension Configuration: InternalEventListener {
      handle everything.
      */
     func onEvent() {
-        guard !downloader.hasPendingRequest || cancelCurrentRequestWhenEventOccursBeforeEnd else {
+        guard !downloader.hasPendingRequest || newEventCancelCurrentOne else {
             //Last request didn't complete so we drop the event.
             return
         }
@@ -336,11 +330,9 @@ extension Configuration: InternalEventListener {
                         } catch let error {
                             self?.handleError(error)
                         }
-                    }
-                    else if let error = error {
+                    } else if let error = error {
                         self?.handleError(error)
-                    }
-                    else {
+                    } else {
                         //We didn't have any data nor error.
                         //TODO: how do Configuration reacts to this?
                     }
@@ -350,7 +342,8 @@ extension Configuration: InternalEventListener {
                         strongSelf.lastCycleDate = NSDate()
 
                         strongSelf.delegates.forEach {
-                            $0.delegate?.configuration(strongSelf, didEndCycleWithError: strongSelf.lastCycleError)
+                            $0.delegate?.configuration(strongSelf,
+                                didEndCycleWithError: strongSelf.lastCycleError)
                         }
                     }
                 }
@@ -384,11 +377,15 @@ extension Configuration: InternalEventListener {
 
         //Let's cache
         let cacheDate = Cache.Date(configurationDate)
-        let dateData = cacheEncryptor?.encryptedData(cacheDate.data) ?? cacheDate.data
+        let dateData = cacheEncryptor?.encryptedData(cacheDate.data)
+            ?? cacheDate.data
+
         if differences.count > 0 {
             let cacheConfiguration = Cache.Configuration(configuration)
-            let configurationData = cacheEncryptor?.encryptedData(cacheConfiguration.data) ?? cacheConfiguration.data
-            try cacher?.storeData(configurationData, atKey: "configuration")
+            let data = cacheEncryptor?.encryptedData(cacheConfiguration.data) ??
+                cacheConfiguration.data
+
+            try cacher?.storeData(data, atKey: "configuration")
         }
         try cacher?.storeData(dateData, atKey: "configuration_date")
 

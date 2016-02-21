@@ -33,8 +33,6 @@ public class TimedEventProducer: NSObject, EventProducer {
      Initialized a `TimedEventProducer` from an array of `NSDate`.
 
      - parameter dates: The dates at which the producer should generate events.
-
-     - returns: An initialized `TimedEventProducer`.
      */
     public init(dates: [NSDate]) {
         self.dates = dates

@@ -104,8 +104,7 @@ extension Dictionary where Value: Equatable {
                     //Value changes
                     changes.append(.Change(key, lhsValue, rhsValue))
                 }
-            }
-            else {
+            } else {
                 //Removal
                 changes.append(.Removal(key, lhsValue))
             }

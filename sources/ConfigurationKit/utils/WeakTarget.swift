@@ -30,8 +30,6 @@ class WeakTarget: NSObject {
      Initializes a `WeakTarget` from a real target.
 
      - parameter target: The real target.
-
-     - returns: An initialzed `WeakTarget`.
      */
     init(_ target: WeakTargetDelegate) {
         self.target = target
@@ -40,9 +38,9 @@ class WeakTarget: NSObject {
     /**
      The selector that will cause the delegate to be called.
 
-     - parameter _: Anything.
+     - parameter sender: Anything.
      */
-    @objc func selector(_: AnyObject) {
+    @objc func selector(sender: AnyObject) {
         target?.selectorCalledOnWeakTarget(self)
     }
 }
