@@ -9,6 +9,22 @@
 import Foundation
 
 /**
+ *  `ConfigurationEventListener` is an internal implementation of `EventListener` so that we don't
+ *  have to make the implementation public.
+ */
+private class ConfigurationEventListener: EventListener {
+    /// The real event listener
+    weak var realEventListener: InternalEventListener?
+
+    /**
+     Called when an event occurs.
+     */
+    func onEvent() {
+        realEventListener?.onEvent()
+    }
+}
+
+/**
  *  Implementing this protocol makes your class eligible to Configuration alerts about cycles and
  *  changes.
  */
