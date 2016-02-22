@@ -9,7 +9,7 @@
 import XCTest
 @testable import ConfigurationKit
 
-struct FakeManager: FileManager {
+class FakeManager: FileManager {
     var customInfo = [String: NSData]()
 
     var onCreate: ((String, Bool, [String: AnyObject]?) throws -> ())?
@@ -45,7 +45,7 @@ class FileCacher_TestCase: XCTestCase {
     let path = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
 
     func testCreationWherePathExistsAndIsADirectory() {
-        var manager = FakeManager()
+        let manager = FakeManager()
 
         manager.onFileExists = { a, b in
             b.memory = true
@@ -58,7 +58,7 @@ class FileCacher_TestCase: XCTestCase {
     }
 
     func testCreationWherePathExistsAndIsNotADirectory() {
-        var manager = FakeManager()
+        let manager = FakeManager()
 
         manager.onFileExists = { a, b in
             b.memory = false
@@ -72,7 +72,7 @@ class FileCacher_TestCase: XCTestCase {
     }
 
     func testCreationWherePathDoesntExistButCreationThrows() {
-        var manager = FakeManager()
+        let manager = FakeManager()
 
         manager.onCreate = { a, b, c in
             throw NSError(domain: "", code: -1, userInfo: nil)
@@ -89,7 +89,7 @@ class FileCacher_TestCase: XCTestCase {
     }
 
     func testCreationWherePathDoesntExistAndCreationSuccess() {
-        var manager = FakeManager()
+        let manager = FakeManager()
 
         manager.onFileExists = { a, b in
             b.memory = false
@@ -104,7 +104,7 @@ class FileCacher_TestCase: XCTestCase {
     func testStoring() {
         let expectation = expectationWithDescription("Waiting for onWrite")
 
-        var manager = FakeManager()
+        let manager = FakeManager()
         manager.onFileExists = { a, b in
             b.memory = false
             return false
@@ -122,29 +122,36 @@ class FileCacher_TestCase: XCTestCase {
     }
 
     func testRetrievingWithStore() {
-        var manager = FakeManager()
+        let manager = FakeManager()
         manager.onFileExists = { a, b in
             b.memory = false
             return false
         }
         manager.onWrite = { (data: NSData, url: NSURL, options: FileCachingOptions) in
-            manager.customInfo[url.absoluteString] = data
+            manager.customInfo[url.path!] = data
         }
         manager.onData = { url in
-            return manager.customInfo[url.absoluteString]
+            return manager.customInfo[url.path!]
         }
         manager.onRemove = { url in
-            manager.customInfo.removeValueForKey(url.absoluteString)
+            manager.customInfo.removeValueForKey(url.path!)
         }
 
         let cacher = try! FileCacher(path: path, options: [], fileManager: manager)
+
+        manager.onFileExists = { a, b in
+            return manager.customInfo[a] != nil
+        }
+
         try! cacher.storeData("abc".dataUsingEncoding(NSASCIIStringEncoding)!, atKey: "key")
 
         let data: NSData! = cacher.dataAtKey("key")
         XCTAssertNotNil(data)
         XCTAssertEqual(String(data: data, encoding: NSASCIIStringEncoding), "abc")
+        XCTAssert(cacher.hasDataAtKey("key"))
 
         cacher.removeDataAtKey("key")
         XCTAssertNil(cacher.dataAtKey("key"))
+        XCTAssertFalse(cacher.hasDataAtKey("key"))
     }
 }

@@ -28,6 +28,7 @@ internal protocol FileManager {
     func removeItemAtURL(URL: NSURL) throws
     func writeData(data: NSData, atURL URL: NSURL, withOptions options: FileCachingOptions) throws
     func dataAtURL(URL: NSURL) -> NSData?
+    func attributesOfItemAtPath(path: String) throws -> [String : AnyObject]
 }
 
 extension NSFileManager: FileManager {
