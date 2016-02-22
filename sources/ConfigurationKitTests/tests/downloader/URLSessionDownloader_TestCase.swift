@@ -69,18 +69,16 @@ class URLSessionDownloader_TestCase: XCTestCase {
 
         urlSession.call = false
 
-        let expectationFailure = expectationWithDescription("Wait for download data completion")
         downloader.downloadData(NSURLRequest()) { data, error in
-            XCTAssertNotNil(error)
-            expectationFailure.fulfill()
+            XCTFail()
         }
 
         urlSession.call = true
 
-        let expectationSuccess = expectationWithDescription("Wait for download data completion")
+        let expectation = expectationWithDescription("Wait for download data completion")
         downloader.downloadData(NSURLRequest()) { data, error in
             XCTAssertNil(error)
-            expectationSuccess.fulfill()
+            expectation.fulfill()
         }
 
         waitForExpectationsWithTimeout(1) { error in

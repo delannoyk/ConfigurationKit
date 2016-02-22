@@ -29,15 +29,6 @@ protocol Downloader {
  *  An `URLSessionDownloader` is an implementation of a Downloader based on `NSURLSession`.
  */
 class URLSessionDownloader: Downloader {
-    /**
-     The possible self-generated errors.
-
-     - Cancelled: The operation was cancelled.
-     */
-    enum URLSessionDownloaderError: ErrorType {
-        case Cancelled
-    }
-
     /// The session to use.
     let session: NSURLSession
 
@@ -46,9 +37,6 @@ class URLSessionDownloader: Downloader {
 
     /// The current task.
     var currentTask: NSURLSessionDataTask?
-
-    /// The current task associated completion.
-    var currentTaskCompletion: ((NSData?, ErrorType?) -> Void)?
 
     /**
      Initializes an `URLSessionDownloader`.
@@ -77,9 +65,8 @@ class URLSessionDownloader: Downloader {
      - parameter completion: The completion to call when data is ready.
      */
     func downloadData(request: NSURLRequest, completion: (NSData?, ErrorType?) -> Void) {
-        if let currentTask = currentTask, currentTaskCompletion = currentTaskCompletion {
+        if let currentTask = currentTask {
             currentTask.cancel()
-            currentTaskCompletion(nil, URLSessionDownloaderError.Cancelled)
         }
 
         let task = session.dataTaskWithRequest(request) { [weak self] data, response, error in
@@ -91,7 +78,6 @@ class URLSessionDownloader: Downloader {
             }
         }
         currentTask = task
-        currentTaskCompletion = completion
         task.resume()
     }
 }
