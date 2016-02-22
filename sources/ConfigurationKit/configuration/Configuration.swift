@@ -75,6 +75,10 @@ private final class WeakDelegate {
  *  <#Description#>
  */
 public final class Configuration {
+    private enum InitializationError: ErrorType {
+        case FileDoesNotExist
+    }
+
     /// The fake event listener
     private let eventListener = ConfigurationEventListener()
 
@@ -182,12 +186,41 @@ public final class Configuration {
      - parameter initialConfigurationFilePath: The path to the initial configuration file. It will
          be treated as a remote file (decrypted and parsed).
      */
-    public init(downloadInitializer: DownloadInitializer,
+    public convenience init(downloadInitializer: DownloadInitializer,
         cacheInitializer: CacheInitializer? = nil,
         cycleGenerators: [EventProducer],
         newEventCancelCurrentOne: Bool = false,
         initialConfigurationFilePath: String) {
-            configuration = [:]//TODO: read the configuration from the file path
+            self.init(downloadInitializer: downloadInitializer,
+                cacheInitializer: cacheInitializer,
+                cycleGenerators: cycleGenerators,
+                newEventCancelCurrentOne: newEventCancelCurrentOne,
+                initialConfigurationFilePath: initialConfigurationFilePath,
+                fileManager: NSFileManager.defaultManager())
+    }
+
+    /**
+     Initializes a `Configuration` with every information needed. This one takes
+     the path to the initial configuration file.
+
+     - parameter downloadInitializer:          The information to use to download file from a remote
+         server.
+     - parameter cacheInitializer:             The information to use to cache downloaded files on
+         the device to always keep the latest version.
+     - parameter cycleGenerators:              The list of event producers that will generate a new
+         refresh cycle.
+     - parameter newEventCancelCurrentOne:     States if a new event should cancel any current
+         refresh request or be dropped.
+     - parameter initialConfigurationFilePath: The path to the initial configuration file. It will
+         be treated as a remote file (decrypted and parsed).
+     - parameter fileManager:                  The file manager used to get content of the file.
+     */
+    internal init(downloadInitializer: DownloadInitializer,
+        cacheInitializer: CacheInitializer? = nil,
+        cycleGenerators: [EventProducer],
+        newEventCancelCurrentOne: Bool = false,
+        initialConfigurationFilePath: String,
+        fileManager: FileManager) {
             downloadEncryptor = downloadInitializer.2
             cacheEncryptor = cacheInitializer?.1
             cacher = cacheInitializer?.0
@@ -196,7 +229,25 @@ public final class Configuration {
             eventProducers = cycleGenerators
             downloader = URLSessionDownloader(responseQueue: cycleQueue)
             self.newEventCancelCurrentOne = newEventCancelCurrentOne
-            configurationDate = NSDate()//TODO: read the attributes from the file path
+
+            configuration = [:]
+            configurationDate = NSDate()
+
+            //FIXME: I hate to use `!`.
+            if cacher == nil || !cacher!.hasDataAtKey(Cache.Configuration.key) {
+                do {
+                    let URL = NSURL(fileURLWithPath: initialConfigurationFilePath)
+                    guard let data = fileManager.dataAtURL(URL) else {
+                        throw InitializationError.FileDoesNotExist
+                    }
+
+                    let decrypted = downloadEncryptor?.decryptedData(data) ?? data
+                    configuration = try parser.parseData(decrypted)
+
+                    let attr = try fileManager.attributesOfItemAtPath(initialConfigurationFilePath)
+                    configurationDate = (attr[NSFileModificationDate] as? NSDate) ?? NSDate()
+                } catch { }
+            }
 
             commonInit()
     }
@@ -209,14 +260,14 @@ public final class Configuration {
         if let confData = cacher?.dataAtKey(Cache.Configuration.key) {
             let data = cacheEncryptor?.decryptedData(confData) ?? confData
             if let cached = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? [String: String] {
-                    configuration = cached
+                configuration = cached
             }
         }
 
         if let dateData = cacher?.dataAtKey(Cache.Date.key) {
             let data = cacheEncryptor?.decryptedData(dateData) ?? dateData
             if let cached = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? NSDate {
-                    configurationDate = cached
+                configurationDate = cached
             }
         }
 
