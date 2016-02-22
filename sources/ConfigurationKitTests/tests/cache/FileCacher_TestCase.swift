@@ -133,6 +133,9 @@ class FileCacher_TestCase: XCTestCase {
         manager.onData = { url in
             return manager.customInfo[url.absoluteString]
         }
+        manager.onRemove = { url in
+            manager.customInfo.removeValueForKey(url.absoluteString)
+        }
 
         let cacher = try! FileCacher(path: path, options: [], fileManager: manager)
         try! cacher.storeData("abc".dataUsingEncoding(NSASCIIStringEncoding)!, atKey: "key")
@@ -140,5 +143,8 @@ class FileCacher_TestCase: XCTestCase {
         let data: NSData! = cacher.dataAtKey("key")
         XCTAssertNotNil(data)
         XCTAssertEqual(String(data: data, encoding: NSASCIIStringEncoding), "abc")
+
+        cacher.removeDataAtKey("key")
+        XCTAssertNil(cacher.dataAtKey("key"))
     }
 }
