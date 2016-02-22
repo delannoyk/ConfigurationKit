@@ -37,4 +37,13 @@ public protocol Cacher {
      - returns: Stored data if existing or nil.
      */
     func dataAtKey(key: String) -> NSData?
+
+    /**
+     Returns a boolean value indicating whether the cacher has data for a specific key.
+
+     - parameter key: The key where the data is supposed to be stored at.
+
+     - returns: A boolean value indicating whether the cacher has data for a specific key
+     */
+    func hasDataAtKey(key: String) -> Bool
 }

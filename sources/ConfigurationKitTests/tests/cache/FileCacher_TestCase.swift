@@ -17,6 +17,7 @@ class FakeManager: FileManager {
     var onRemove: (NSURL throws -> ())?
     var onWrite: ((NSData, NSURL, FileCachingOptions) throws -> ())?
     var onData: (NSURL -> NSData?)?
+    var onAttributes: (String throws -> [String: AnyObject])?
 
     func createDirectoryAtPath(path: String,
         withIntermediateDirectories createIntermediates: Bool,
@@ -38,6 +39,10 @@ class FakeManager: FileManager {
 
     func dataAtURL(URL: NSURL) -> NSData? {
         return onData?(URL)
+    }
+
+    func attributesOfItemAtPath(path: String) throws -> [String : AnyObject] {
+        return try onAttributes?(path) ?? [:]
     }
 }
 

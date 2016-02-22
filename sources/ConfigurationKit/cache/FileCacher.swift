@@ -149,4 +149,16 @@ public struct FileCacher: Cacher {
         let URL = NSURL(fileURLWithPath: path).URLByAppendingPathComponent(key)
         return fileManager.dataAtURL(URL)
     }
+
+    /**
+     Returns a boolean value indicating whether the cacher has data for a specific key.
+
+     - parameter key: The key where the data is supposed to be stored at.
+
+     - returns: A boolean value indicating whether the cacher has data for a specific key
+     */
+    public func hasDataAtKey(key: String) -> Bool {
+        let URL = NSURL(fileURLWithPath: path).URLByAppendingPathComponent(key)
+        return URL.path.map { fileManager.fileExistsAtPath($0, isDirectory: nil) } ?? false
+    }
 }
