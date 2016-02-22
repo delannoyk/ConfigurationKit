@@ -91,6 +91,7 @@ class URLSessionDownloader: Downloader {
             }
         }
         currentTask = task
+        currentTaskCompletion = completion
         task.resume()
     }
 }
