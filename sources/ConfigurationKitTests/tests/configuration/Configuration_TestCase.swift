@@ -22,6 +22,19 @@ class Configuration_TestCase: XCTestCase {
         }
     }
 
+    class FakeDownloader: Downloader {
+        var hasPendingRequest = false
+
+        var onDownload: ((NSURLRequest, (NSData?, ErrorType?) -> Void) -> Void)?
+        func downloadData(request: NSURLRequest, completion: (NSData?, ErrorType?) -> Void) {
+            hasPendingRequest = true
+            onDownload?(request) { [weak self] in
+                self?.hasPendingRequest = false
+                completion($0, $1)
+            }
+        }
+    }
+
     class Delegate: ConfigurationDelegate {
         var onChange: (Change<String, String> -> Void)?
         var onEnd: (ErrorType? -> Void)?
@@ -71,14 +84,115 @@ class Configuration_TestCase: XCTestCase {
 
         let delegate = Delegate()
         configuration.registerDelegate(delegate)
+        configuration.downloader = FakeDownloader()
 
         let expectation = expectationWithDescription("Waiting for delegate to get called")
         delegate.onBegin = {
             expectation.fulfill()
         }
+        eventProducer.eventListener?.onEvent()
+
+        waitForExpectationsWithTimeout(1) { error in
+            if let _ = error {
+                XCTFail()
+            }
+        }
+    }
+
+    func testConfigurationFireChangeWhenCycleEndsWithAValueChanged() {
+        let eventProducer = E()
+        let downloader = FakeDownloader()
+
+        let configuration = Configuration(downloadInitializer: download,
+            cycleGenerators: [eventProducer],
+            initialConfiguration: ["a":"0"])
+        configuration.downloader = downloader
+
+        downloader.onDownload = { request, completion in
+            completion("{\"a\": \"1\"}".dataUsingEncoding(NSUTF8StringEncoding), nil)
+        }
+
+        let delegate = Delegate()
+        configuration.registerDelegate(delegate)
+
+        let expectation = expectationWithDescription("Waiting for delegate to get called")
+        delegate.onChange = { change in
+            XCTAssert(change.isChange)
+            XCTAssertEqual(change.key, "a")
+            XCTAssertEqual(change.oldValue, "0")
+            XCTAssertEqual(change.newValue, "1")
+            expectation.fulfill()
+        }
 
         eventProducer.eventListener?.onEvent()
-        XCTAssert(configuration.downloader.hasPendingRequest)
+
+        waitForExpectationsWithTimeout(1) { error in
+            if let _ = error {
+                XCTFail()
+            }
+        }
+    }
+
+    func testConfigurationFireDeleteWhenCycleEndsWithAKeyRemoved() {
+        let eventProducer = E()
+        let downloader = FakeDownloader()
+
+        let configuration = Configuration(downloadInitializer: download,
+            cycleGenerators: [eventProducer],
+            initialConfiguration: ["a":"0"])
+        configuration.downloader = downloader
+
+        downloader.onDownload = { request, completion in
+            completion("{}".dataUsingEncoding(NSUTF8StringEncoding), nil)
+        }
+
+        let delegate = Delegate()
+        configuration.registerDelegate(delegate)
+
+        let expectation = expectationWithDescription("Waiting for delegate to get called")
+        delegate.onChange = { change in
+            XCTAssert(change.isRemoval)
+            XCTAssertEqual(change.key, "a")
+            XCTAssertEqual(change.oldValue, "0")
+            XCTAssertNil(change.newValue)
+            expectation.fulfill()
+        }
+
+        eventProducer.eventListener?.onEvent()
+
+        waitForExpectationsWithTimeout(1) { error in
+            if let _ = error {
+                XCTFail()
+            }
+        }
+    }
+
+    func testConfigurationFireDeleteWhenCycleEndsWithAKeyAdded() {
+        let eventProducer = E()
+        let downloader = FakeDownloader()
+
+        let configuration = Configuration(downloadInitializer: download,
+            cycleGenerators: [eventProducer],
+            initialConfiguration: ["a":"0"])
+        configuration.downloader = downloader
+
+        downloader.onDownload = { request, completion in
+            completion("{\"a\": \"0\", \"b\": \"1\"}".dataUsingEncoding(NSUTF8StringEncoding), nil)
+        }
+
+        let delegate = Delegate()
+        configuration.registerDelegate(delegate)
+
+        let expectation = expectationWithDescription("Waiting for delegate to get called")
+        delegate.onChange = { change in
+            XCTAssert(change.isAddition)
+            XCTAssertEqual(change.key, "b")
+            XCTAssertNil(change.oldValue)
+            XCTAssertEqual(change.newValue, "1")
+            expectation.fulfill()
+        }
+
+        eventProducer.eventListener?.onEvent()
 
         waitForExpectationsWithTimeout(1) { error in
             if let _ = error {
