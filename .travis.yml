@@ -1,5 +1,6 @@
 language: objective-c
 osx_image: xcode7.2
+before_install: gem install xcpretty slather -N
 env:
   global:
   - LC_CTYPE=en_US.UTF-8
@@ -15,7 +16,12 @@ script:
   - xcodebuild -showsdks
 
   # Build Framework in Debug and Run Tests if specified
-  - xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" -configuration Debug ONLY_ACTIVE_ARCH=NO build test | xcpretty -c;
+  - xcodebuild -project "$PROJECT" -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" -configuration Debug -enableCodeCoverage YES ONLY_ACTIVE_ARCH=NO build test | xcpretty -t --report junit --output junit.xml;
+
 notifications:
   slack:
     secure: fUy7u8lQYbk01yYuLvI0R9b36F9Lh/rtNHwf1JLcVXuj3A+iOiE8E6NzyIFv+49pyG7KCRRaOyh5U/d8QCqsGelSn+RYHcYWmxmIo/sjynisBNDsU3BenfzZBKv4fhtiXn7WylwrgY5I96NOjTWoFvnLX/pncFDYc3ITFiE2j0M=
+
+after_success:
+  - slather coverage --input-format profdata -i '.*Tests.*' --cobertura-xml --scheme ConfigurationKit sources/ConfigurationKit.xcodeproj
+  - bash <(curl -s https://codecov.io/bash)
