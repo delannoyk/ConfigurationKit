@@ -23,5 +23,4 @@ notifications:
     secure: fUy7u8lQYbk01yYuLvI0R9b36F9Lh/rtNHwf1JLcVXuj3A+iOiE8E6NzyIFv+49pyG7KCRRaOyh5U/d8QCqsGelSn+RYHcYWmxmIo/sjynisBNDsU3BenfzZBKv4fhtiXn7WylwrgY5I96NOjTWoFvnLX/pncFDYc3ITFiE2j0M=
 
 after_success:
-  - slather coverage --input-format profdata -i '.*Tests.*' --cobertura-xml --scheme ConfigurationKit sources/ConfigurationKit.xcodeproj
-  - bash <(curl -s https://codecov.io/bash)
+  - slather
