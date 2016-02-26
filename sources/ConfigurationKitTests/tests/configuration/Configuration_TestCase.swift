@@ -93,6 +93,9 @@ class Configuration_TestCase: XCTestCase {
         eventProducer.eventListener?.onEvent()
 
         waitForExpectationsWithTimeout(1) { error in
+            configuration.unregisterDelegate(delegate)
+            XCTAssertEqual(configuration.delegates.count, 0)
+
             if let _ = error {
                 XCTFail()
             }
