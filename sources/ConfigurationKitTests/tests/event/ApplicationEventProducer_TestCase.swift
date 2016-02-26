@@ -14,7 +14,7 @@ class E: EventListener {
     var eventCount = 0
 
     func onEvent() {
-        eventCount++
+        eventCount += 1
         onEventClosure?()
     }
 }
