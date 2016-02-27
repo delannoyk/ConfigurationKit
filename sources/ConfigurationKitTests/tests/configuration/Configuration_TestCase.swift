@@ -35,6 +35,26 @@ class Configuration_TestCase: XCTestCase {
         }
     }
 
+    class FakeCacher: Cacher {
+        var cache = [String: NSData]()
+
+        func storeData(data: NSData, atKey key: String) throws {
+            cache[key] = data
+        }
+
+        func removeDataAtKey(key: String) {
+            cache.removeValueForKey(key)
+        }
+
+        func dataAtKey(key: String) -> NSData? {
+            return cache[key]
+        }
+
+        func hasDataAtKey(key: String) -> Bool {
+            return cache[key] != nil
+        }
+    }
+
     class Delegate: ConfigurationDelegate {
         var onChange: (Change<String, String> -> Void)?
         var onEnd: (ErrorType? -> Void)?
@@ -202,5 +222,19 @@ class Configuration_TestCase: XCTestCase {
                 XCTFail()
             }
         }
+    }
+
+    func testConfigurationInitialConfigurationWithCacher() {
+        let cacher = FakeCacher()
+        cacher.cache["configuration"] = NSKeyedArchiver.archivedDataWithRootObject(["a":"1", "b":"2"])
+        cacher.cache["date"] = NSKeyedArchiver.archivedDataWithRootObject(NSDate())
+
+        let configuration = Configuration(downloadInitializer: download,
+            cacheInitializer: (cacher, nil),
+            cycleGenerators: [],
+            newEventCancelCurrentOne: true,
+            initialConfiguration: [:])
+        XCTAssertEqual(configuration["a"], "1")
+        XCTAssertEqual(configuration["b"], "2")
     }
 }
