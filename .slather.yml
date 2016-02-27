@@ -1,5 +1,6 @@
-coverage_service: coveralls
+coverage_service: cobertura_xml
 xcodeproj: sources/ConfigurationKit.xcodeproj
+source_directory: sources/ConfigurationKit/*
+output_directory: .
 ignore:
   - sources/ConfigurationKitTests/*
-
