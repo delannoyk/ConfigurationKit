@@ -92,7 +92,7 @@ public final class Configuration {
     private let cycleQueue = dispatch_queue_create("be.delannoyk.configurationkit", nil)
 
     /// The delegates.
-    private var delegates = [WeakDelegate]()
+    private var weakDelegates = [WeakDelegate]()
 
     /// The current configuration.
     private var configuration: [String: String]
@@ -311,7 +311,7 @@ public final class Configuration {
      - parameter delegate: The delegate.
      */
     public func registerDelegate(delegate: ConfigurationDelegate) {
-        delegates.append(WeakDelegate(delegate))
+        weakDelegates.append(WeakDelegate(delegate))
     }
 
     /**
@@ -320,9 +320,14 @@ public final class Configuration {
      - parameter delegate: The delegate.
      */
     public func unregisterDelegate(delegate: ConfigurationDelegate) {
-        delegates = delegates.filter {
+        weakDelegates = weakDelegates.filter {
             return !($0.delegate === delegate || $0.delegate == nil)
         }
+    }
+
+    /// The registered delegates.
+    public var delegates: [ConfigurationDelegate] {
+        return weakDelegates.flatMap { $0.delegate }
     }
 
 
@@ -359,7 +364,7 @@ extension Configuration: InternalEventListener {
         }
 
         delegates.forEach {
-            $0.delegate?.configurationWillBeginCycle(self)
+            $0.configurationWillBeginCycle(self)
         }
 
         dispatch_async(cycleQueue) { [weak self] in
@@ -386,7 +391,7 @@ extension Configuration: InternalEventListener {
                         strongSelf.lastCycleDate = NSDate()
 
                         strongSelf.delegates.forEach {
-                            $0.delegate?.configuration(strongSelf,
+                            $0.configuration(strongSelf,
                                 didEndCycleWithError: strongSelf.lastCycleError)
                         }
                     }
@@ -415,7 +420,7 @@ extension Configuration: InternalEventListener {
         //Fire delegate events
         differences.forEach { change in
             delegates.forEach {
-                $0.delegate?.configuration(self, didDetectChange: change)
+                $0.configuration(self, didDetectChange: change)
             }
         }
 
