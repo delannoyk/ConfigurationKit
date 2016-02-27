@@ -15,7 +15,7 @@ class SimpleURLBuilder_TestCase: XCTestCase {
     func testURLRequest() {
         if let URL = NSURL(string: "https://github.com/delannoyk") {
             let URLRequest = NSURLRequest(URL: URL)
-            let URLBuilder = SimpleURLBuilder(URLRequest: URLRequest)
+            let URLBuilder = SimpleURLBuilder(urlRequest: URLRequest)
             XCTAssert(URLBuilder.URLRequest() == URLRequest, "URLRequest should be the same as the URLRequest given at initialization")
         }
         else {

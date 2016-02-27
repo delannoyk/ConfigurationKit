@@ -9,33 +9,29 @@
 import Foundation
 
 /**
- *  A `SimpleURLBuilder` is an URLBuilder implementation that uses a static URL
- *  to download periodically a configuration file.
+ *  A `SimpleURLBuilder` is an URLBuilder implementation that uses a static URL to download
+ *  periodically a configuration file.
  */
 public struct SimpleURLBuilder: URLBuilder {
     /// The URLRequest.
-    private let _URLRequest: NSURLRequest
+    private let _urlRequest: NSURLRequest
 
     /**
     Initializes a `SimpleURLBuilder` with a `NSURL`.
 
     - parameter URL: The URL heading to a configuration file.
-
-    - returns: An initialized `SimpleURLBuilder`.
     */
     public init(URL: NSURL) {
-        self.init(URLRequest: NSURLRequest(URL: URL))
+        self.init(urlRequest: NSURLRequest(URL: URL))
     }
 
     /**
      Initializes a `SimpleURLBuilder` with a `NSURLRequest`.
 
-     - parameter URLRequest: The URLRequest heading to a configuration file.
-
-     - returns: An initialized `SimpleURLBuilder`.
+     - parameter urlRequest: The URLRequest heading to a configuration file.
      */
-    public init(URLRequest: NSURLRequest) {
-        _URLRequest = URLRequest
+    public init(urlRequest: NSURLRequest) {
+        _urlRequest = urlRequest
     }
 
 
@@ -45,6 +41,6 @@ public struct SimpleURLBuilder: URLBuilder {
     - returns: The `NSURLRequest` built at initialization.
     */
     public func URLRequest() -> NSURLRequest {
-        return _URLRequest
+        return _urlRequest
     }
 }

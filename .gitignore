@@ -29,3 +29,6 @@ DerivedData
 #
 # Pods/
 
+# Sonar
+sonar*
+.sonar
