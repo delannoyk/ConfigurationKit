@@ -95,6 +95,56 @@ class Configuration_TestCase: XCTestCase {
         XCTAssertEqual(configuration["a"], "b")
     }
 
+    func testConfigurationHasInitialKeysWhenUsingCacher() {
+        let path = NSURL(fileURLWithPath: "configuration").path!
+        let fileContent = "{\"a\": \"0\", \"b\": \"1\"}"
+        let date = NSDate(timeIntervalSince1970: 0)
+
+        let fileManager = FakeManager()
+        fileManager.onData = { url in
+            if let p = url.path where p == path {
+                return fileContent.dataUsingEncoding(NSUTF8StringEncoding)
+            }
+            return nil
+        }
+        fileManager.onAttributes = { path in
+            return [NSFileModificationDate: date]
+        }
+
+        let configuration = Configuration(downloadInitializer: download,
+            cacheInitializer: nil,
+            cycleGenerators: [],
+            newEventCancelCurrentOne: false,
+            initialConfigurationFilePath: path,
+            fileManager: fileManager)
+        XCTAssertNotNil(configuration["a"])
+        XCTAssertEqual(configuration["a"], "0")
+        XCTAssertNotNil(configuration["b"])
+        XCTAssertEqual(configuration["b"], "1")
+        XCTAssertEqual(configuration.configurationDate, date)
+    }
+
+    func testConfigurationFailsToLoadIfFileDoesntExist() {
+        let path = NSURL(fileURLWithPath: "configuration").path!
+
+        let fileManager = FakeManager()
+        fileManager.onData = { url in
+            return nil
+        }
+        fileManager.onAttributes = { path in
+            return [:]
+        }
+
+        let configuration = Configuration(downloadInitializer: download,
+            cacheInitializer: nil,
+            cycleGenerators: [],
+            newEventCancelCurrentOne: false,
+            initialConfigurationFilePath: path,
+            fileManager: fileManager)
+        XCTAssertNil(configuration["a"])
+        XCTAssertNil(configuration["b"])
+    }
+
     func testCycleBeginsWhenProducingAnEvent() {
         let eventProducer = E()
 
