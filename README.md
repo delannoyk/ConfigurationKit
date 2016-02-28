@@ -44,7 +44,23 @@ TODO
 
 # Installation
 
-TODO
+## CocoaPods
+
+Add ConfigurationKit to your `Podfile`:
+```ruby
+pod 'ConfigurationKit'
+```
+
+## Carthage
+
+Add ConfigurationKit to your `Cartfile`:
+```ruby
+github "delannoyk/ConfigurationKit"
+```
+
+## Source
+
+Add `sources/ConfigurationKit/**/*.swift` to your project.
 
 # Default implementation
 ConfigurationKit provides default implementation for most of the protocols
