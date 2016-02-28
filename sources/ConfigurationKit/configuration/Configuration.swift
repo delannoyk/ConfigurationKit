@@ -74,7 +74,7 @@ private final class WeakDelegate {
 /**
  *  <#Description#>
  */
-public final class Configuration {
+public class Configuration {
     private enum InitializationError: ErrorType {
         case FileDoesNotExist
     }
@@ -123,13 +123,13 @@ public final class Configuration {
     public var newEventCancelCurrentOne: Bool
 
     /// The date of the last refresh of configuration.
-    public private(set) var configurationDate: NSDate
+    public private(set) final var configurationDate: NSDate
 
     /// The date when the last cycle happened.
-    public private(set) var lastCycleDate: NSDate?
+    public private(set) final var lastCycleDate: NSDate?
 
     /// The error that happened at last cycle if any.
-    public private(set) var lastCycleError: ErrorType?
+    public private(set) final var lastCycleError: ErrorType?
 
 
     /// The Cache information to use.
@@ -297,7 +297,7 @@ public final class Configuration {
 
      - returns: The value associated with `key`, or nil if no value is associated with `key`.
      */
-    public subscript(key: String) -> String? {
+    public final subscript(key: String) -> String? {
         configurationMutex.lock()
         let value = configuration[key]
         configurationMutex.unlock()
@@ -310,7 +310,7 @@ public final class Configuration {
 
      - parameter delegate: The delegate.
      */
-    public func registerDelegate(delegate: ConfigurationDelegate) {
+    public final func registerDelegate(delegate: ConfigurationDelegate) {
         weakDelegates.append(WeakDelegate(delegate))
     }
 
@@ -319,14 +319,14 @@ public final class Configuration {
 
      - parameter delegate: The delegate.
      */
-    public func unregisterDelegate(delegate: ConfigurationDelegate) {
+    public final func unregisterDelegate(delegate: ConfigurationDelegate) {
         weakDelegates = weakDelegates.filter {
             return !($0.delegate === delegate || $0.delegate == nil)
         }
     }
 
     /// The registered delegates.
-    public var delegates: [ConfigurationDelegate] {
+    public final var delegates: [ConfigurationDelegate] {
         return weakDelegates.flatMap { $0.delegate }
     }
 
