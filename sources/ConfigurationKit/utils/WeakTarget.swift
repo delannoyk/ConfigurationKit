@@ -6,7 +6,7 @@
 //  Copyright © 2016 Kevin Delannoy. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 /// The protocol to conform to in order to use a weak target.
 protocol WeakTargetDelegate: class {
