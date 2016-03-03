@@ -7,10 +7,10 @@ env:
   - LC_CTYPE=en_US.UTF-8
   - LANG=en_US.UTF-8
   - PROJECT=sources/ConfigurationKit.xcodeproj
-  - IOS_FRAMEWORK_SCHEME="ConfigurationKit"
+  - IOS_FRAMEWORK_SCHEME="ConfigurationKit iOS"
   - IOS_SDK=iphonesimulator9.2
   matrix:
-    - DESTINATION="OS=9.2,name=iPhone 6S" SCHEME="$IOS_FRAMEWORK_SCHEME"  SDK="$IOS_SDK"
+    - DESTINATION="OS=9.2,name=iPhone 6S" SCHEME="$IOS_FRAMEWORK_SCHEME" SDK="$IOS_SDK"
 script:
   - set -o pipefail
   - xcodebuild -version
@@ -22,5 +22,5 @@ notifications:
   slack:
     secure: fUy7u8lQYbk01yYuLvI0R9b36F9Lh/rtNHwf1JLcVXuj3A+iOiE8E6NzyIFv+49pyG7KCRRaOyh5U/d8QCqsGelSn+RYHcYWmxmIo/sjynisBNDsU3BenfzZBKv4fhtiXn7WylwrgY5I96NOjTWoFvnLX/pncFDYc3ITFiE2j0M=
 after_success:
-  - slather coverage --input-format profdata -i ".*Tests.*" --scheme ConfigurationKit sources/ConfigurationKit.xcodeproj
+  - slather coverage --input-format profdata -i ".*Tests.*" --scheme "ConfigurationKit iOS" sources/ConfigurationKit.xcodeproj
   - bash <(curl -s https://codecov.io/bash) -f cobertura.xml
