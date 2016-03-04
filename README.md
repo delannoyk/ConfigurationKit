@@ -39,27 +39,23 @@ Again, because security matters, another `Encryptor` can be used to encrypt data
 before calling any method of the `Cacher`.
 
 # Usage
-
 TODO
 
 # Installation
 
 ## CocoaPods
-
 Add ConfigurationKit to your `Podfile`:
 ```ruby
 pod 'ConfigurationKit'
 ```
 
 ## Carthage
-
 Add ConfigurationKit to your `Cartfile`:
 ```ruby
 github "delannoyk/ConfigurationKit"
 ```
 
 ## Source
-
 Add `sources/ConfigurationKit/**/*.swift` to your project.
 
 # Default implementation
@@ -99,13 +95,11 @@ from a JSON file that can be represented as a `[String: String]`. For example:
 
 ## EventProducer
 ### ApplicationEventProducer
-
-TODO
+The `ApplicationEventProducer` is available on iOS and tvOS. It produces an
+event when the application enters foreground back from background.
 
 ### StopWatchEventProducer
-
-TODO
+A `StopWatchEventProducer` generates events as a repeating timer would.
 
 ### TimedEventProducer
-
-TODO
+A `TimedEventProducer` generates events a specific dates and times.
