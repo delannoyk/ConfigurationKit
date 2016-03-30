@@ -18,6 +18,12 @@ protocol WeakTargetDelegate: class {
     func selectorCalledOnWeakTarget(target: WeakTarget)
 }
 
+extension Selector {
+    /// The selector that `WeakTarget` will answer and call the delegate.
+    static let weakTargetSelector = #selector(WeakTarget.selector(_:))
+}
+
+
 /**
  *  A `WeakTarget` is used so that a NSTimer doesn't retain the real target and the real target can
  *  invalidate the timer in its deinit.
@@ -40,7 +46,7 @@ class WeakTarget: NSObject {
 
      - parameter sender: Anything.
      */
-    @objc func selector(sender: AnyObject) {
+    @objc private func selector(sender: AnyObject) {
         target?.selectorCalledOnWeakTarget(self)
     }
 }

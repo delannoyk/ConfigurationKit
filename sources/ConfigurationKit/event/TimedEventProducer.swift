@@ -61,7 +61,7 @@ public class TimedEventProducer: NSObject, EventProducer {
         if let date = dates.first {
             timer = NSTimer.scheduledTimerWithTimeInterval(date.timeIntervalSinceNow,
                 target: WeakTarget(self),
-                selector: "selector:",
+                selector: .weakTargetSelector,
                 userInfo: nil,
                 repeats: false)
         }

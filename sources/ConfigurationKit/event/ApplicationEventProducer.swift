@@ -36,7 +36,7 @@ public class ApplicationEventProducer: NSObject, EventProducer {
         }
 
         NSNotificationCenter.defaultCenter().addObserver(self,
-            selector: "applicationWillEnterForeground:",
+            selector: #selector(UIApplicationDelegate.applicationWillEnterForeground(_:)),
             name: UIApplicationWillEnterForegroundNotification,
             object: UIApplication.sharedApplication())
         started = true

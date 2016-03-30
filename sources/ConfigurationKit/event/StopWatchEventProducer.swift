@@ -57,7 +57,7 @@ public class StopWatchEventProducer: NSObject, EventProducer {
 
         timer = NSTimer.scheduledTimerWithTimeInterval(timeInterval,
             target: WeakTarget(self),
-            selector: "selector:",
+            selector: .weakTargetSelector,
             userInfo: nil,
             repeats: true)
     }
