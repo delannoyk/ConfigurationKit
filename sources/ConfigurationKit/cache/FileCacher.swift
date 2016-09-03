@@ -80,6 +80,13 @@ public struct FileCacher: Cacher {
     /// The file manager
     internal let fileManager: FileManager
 
+    /// Initializes a FileCacher.
+    public init(path: String, options: FileCachingOptions) {
+        self.path = path
+        self.options = options
+        self.fileManager = NSFileManager.defaultManager()
+    }
+
     /**
      Initializes a `FileCacher` with a specific path to store files at.
 
