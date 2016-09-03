@@ -21,6 +21,9 @@ public enum FlatJSONParsingError: ErrorType {
  *  An implementation of a Parser that reads a configuration from plist data.
  */
 public struct FlatJSONParser: Parser {
+    /// Initializes a FlatJSONParser.
+    public init() { }
+
     /**
      Parse data into a Dictionary where Key: String, Value: String. The result of this parsing
      should be a valid configuration.
