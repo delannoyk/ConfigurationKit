@@ -10,7 +10,7 @@
 		460743421C707B83001AE5A6 /* FileCacher_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460743411C707B83001AE5A6 /* FileCacher_TestCase.swift */; };
 		460FA82A1B63A6AA00BBE0EE /* FlatJSONParser_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460FA8291B63A6AA00BBE0EE /* FlatJSONParser_TestCase.swift */; };
 		460FA82C1B63A6B700BBE0EE /* PListParser_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 460FA82B1B63A6B700BBE0EE /* PListParser_TestCase.swift */; };
-		461AADFB1A55D57A005183C5 /* SimpleURLBuilder_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461AADFA1A55D57A005183C5 /* SimpleURLBuilder_TestCase.swift */; };
+		461AADFB1A55D57A005183C5 /* SimpleURLRequestBuilder_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461AADFA1A55D57A005183C5 /* SimpleURLRequestBuilder_TestCase.swift */; };
 		4633D0A91B63A7E600EB10D5 /* SampleConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = 4633D0A81B63A7E600EB10D5 /* SampleConfig.json */; };
 		4633D0AB1B63A7FE00EB10D5 /* SampleConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4633D0AA1B63A7FE00EB10D5 /* SampleConfig.plist */; };
 		4644B9AF1B6410B7003253FA /* URLSessionDownloader_TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4644B9AE1B6410B7003253FA /* URLSessionDownloader_TestCase.swift */; };
@@ -105,7 +105,7 @@
 		4613B5BD1A3E15E4001DB168 /* SimpleURLRequestBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleURLRequestBuilder.swift; sourceTree = "<group>"; };
 		4613B5C21A3E1F10001DB168 /* Downloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Downloader.swift; sourceTree = "<group>"; };
 		4613B5C51A3E1F85001DB168 /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
-		461AADFA1A55D57A005183C5 /* SimpleURLBuilder_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleURLBuilder_TestCase.swift; sourceTree = "<group>"; };
+		461AADFA1A55D57A005183C5 /* SimpleURLRequestBuilder_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleURLRequestBuilder_TestCase.swift; sourceTree = "<group>"; };
 		4633D0A81B63A7E600EB10D5 /* SampleConfig.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = SampleConfig.json; sourceTree = "<group>"; };
 		4633D0AA1B63A7FE00EB10D5 /* SampleConfig.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SampleConfig.plist; sourceTree = "<group>"; };
 		4644B9AE1B6410B7003253FA /* URLSessionDownloader_TestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLSessionDownloader_TestCase.swift; sourceTree = "<group>"; };
@@ -305,7 +305,7 @@
 		461AADF61A55D519005183C5 /* url_builder */ = {
 			isa = PBXGroup;
 			children = (
-				461AADFA1A55D57A005183C5 /* SimpleURLBuilder_TestCase.swift */,
+				461AADFA1A55D57A005183C5 /* SimpleURLRequestBuilder_TestCase.swift */,
 			);
 			path = url_builder;
 			sourceTree = "<group>";
@@ -596,7 +596,7 @@
 			files = (
 				46869C2F1C7B2E1D006281D0 /* Configuration_TestCase.swift in Sources */,
 				460FA82C1B63A6B700BBE0EE /* PListParser_TestCase.swift in Sources */,
-				461AADFB1A55D57A005183C5 /* SimpleURLBuilder_TestCase.swift in Sources */,
+				461AADFB1A55D57A005183C5 /* SimpleURLRequestBuilder_TestCase.swift in Sources */,
 				4644B9AF1B6410B7003253FA /* URLSessionDownloader_TestCase.swift in Sources */,
 				46AA175C1C786AEC00EAC848 /* ApplicationEventProducer_TestCase.swift in Sources */,
 				460743421C707B83001AE5A6 /* FileCacher_TestCase.swift in Sources */,

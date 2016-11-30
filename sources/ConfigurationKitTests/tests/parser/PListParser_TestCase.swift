@@ -18,7 +18,7 @@ class PListParser_TestCase: XCTestCase {
         let parser = PListParser()
         let result: [String: String]
         do {
-            result = try parser.parseData(data)
+            result = try parser.parse(data)
         } catch {
             XCTFail()
             return
@@ -41,7 +41,7 @@ class PListParser_TestCase: XCTestCase {
 
         let parser = PListParser()
         do {
-            let _ = try parser.parseData(data)
+            let _ = try parser.parse(data)
             XCTFail()
         } catch {}
     }

@@ -19,7 +19,7 @@ class FlatJSONParser_TestCase: XCTestCase {
         let result: [String: String]
 
         do {
-            result = try parser.parseData(data)
+            result = try parser.parse(data)
         } catch {
             XCTFail()
             return
@@ -42,7 +42,7 @@ class FlatJSONParser_TestCase: XCTestCase {
 
         let parser = FlatJSONParser()
         do {
-            let _ = try parser.parseData(data)
+            let _ = try parser.parse(data)
             XCTFail()
         } catch {}
     }

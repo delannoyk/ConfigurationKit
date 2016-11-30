@@ -16,18 +16,17 @@ class StopWatchEventProducer_TestCase: XCTestCase {
         let producer = StopWatchEventProducer(timeInterval: 0.1)
         producer.eventListener = listener
 
-        let expectation = expectationWithDescription("Waiting for the timer to fire")
+        let e = expectation(description: "Waiting for the timer to fire")
         listener.onEventClosure = {
             XCTFail()
         }
 
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
-        dispatch_after(delayTime, dispatch_get_main_queue()) {
-            expectation.fulfill()
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
+            e.fulfill()
         }
 
         //Let's wait 1sec
-        waitForExpectationsWithTimeout(1) { error in
+        waitForExpectations(timeout: 1) { error in
         }
     }
 
@@ -39,12 +38,12 @@ class StopWatchEventProducer_TestCase: XCTestCase {
         producer.startProducingEvents()
 
         //Let's start producing event and then retry sending a notification.
-        let expectationToReceiveEvent = expectationWithDescription("Let's wait for an event")
+        let expectationToReceiveEvent = expectation(description: "Let's wait for an event")
         listener.onEventClosure = {
             expectationToReceiveEvent.fulfill()
         }
 
-        waitForExpectationsWithTimeout(1) { error in
+        waitForExpectations(timeout: 1) { error in
             if let _ = error {
                 XCTFail()
             }
@@ -60,18 +59,17 @@ class StopWatchEventProducer_TestCase: XCTestCase {
         producer.stopProducingEvents()
 
         //Ok, same thing but we stop producing events
-        let expectation = expectationWithDescription("Waiting for the timer to fire")
+        let e = expectation(description: "Waiting for the timer to fire")
         listener.onEventClosure = {
             XCTFail()
         }
 
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
-        dispatch_after(delayTime, dispatch_get_main_queue()) {
-            expectation.fulfill()
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
+            e.fulfill()
         }
 
         //Let's wait 1sec
-        waitForExpectationsWithTimeout(1) { error in
+        waitForExpectations(timeout: 1) { error in
         }
     }
 
@@ -85,15 +83,15 @@ class StopWatchEventProducer_TestCase: XCTestCase {
         let date = NSDate()
 
         //Ok, same thing but we stop producing events
-        let expectation = expectationWithDescription("Waiting for the timer to fire")
+        let e = expectation(description: "Waiting for the timer to fire")
         listener.onEventClosure = {
             XCTAssert(date.timeIntervalSinceNow < -1 && date.timeIntervalSinceNow > -1.2)
-            expectation.fulfill()
+            e.fulfill()
         }
 
         producer.timeInterval = 1
 
-        waitForExpectationsWithTimeout(2) { error in
+        waitForExpectations(timeout: 2) { error in
             if let _ = error {
                 XCTFail()
             }

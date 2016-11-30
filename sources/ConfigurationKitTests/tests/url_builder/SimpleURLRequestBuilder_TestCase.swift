@@ -15,13 +15,13 @@ class SimpleURLRequestBuilder_TestCase: XCTestCase {
         let url = URL(string: "https://github.com/delannoyk")!
         let request = URLRequest(url: url)
         let requestBuilder = SimpleURLRequestBuilder(urlRequest: request)
-        XCTAssert(requestBuilder.URLRequest() == request, "URLRequest should be the same as the URLRequest given at initialization")
+        XCTAssert(requestBuilder.urlRequest() == request, "URLRequest should be the same as the URLRequest given at initialization")
     }
 
     //Testing URL
     func testURL() {
-        let url = URL(string: "https://github.com/delannoyk")
-        let requestBuilder = SimpleURLRequestBuilder(URL: url)
-        XCTAssert(requestBuilder.URLRequest().url == url, "URL of URLRequest should be the same as the URL given at initialization")
+        let url = URL(string: "https://github.com/delannoyk")!
+        let requestBuilder = SimpleURLRequestBuilder(url: url)
+        XCTAssert(requestBuilder.urlRequest().url == url, "URL of URLRequest should be the same as the URL given at initialization")
     }
 }

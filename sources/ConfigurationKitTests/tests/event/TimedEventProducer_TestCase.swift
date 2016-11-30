@@ -13,38 +13,37 @@ class TimedEventProducer_TestCase: XCTestCase {
     func testNoEventProductionWhenNotStarted() {
         let listener = E()
 
-        let producer = TimedEventProducer(dates: [NSDate(timeIntervalSinceNow: 1)])
+        let producer = TimedEventProducer(dates: [Date(timeIntervalSinceNow: 1)])
         producer.eventListener = listener
 
-        let expectation = expectationWithDescription("Waiting for the timer to fire")
+        let e = expectation(description: "Waiting for the timer to fire")
         listener.onEventClosure = {
             XCTFail()
         }
 
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1.5 * Double(NSEC_PER_SEC)))
-        dispatch_after(delayTime, dispatch_get_main_queue()) {
-            expectation.fulfill()
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1500)) {
+            e.fulfill()
         }
 
         //Let's wait 1sec
-        waitForExpectationsWithTimeout(2) { error in
+        waitForExpectations(timeout: 2) { error in
         }
     }
 
     func testEventProductionWhenStarted() {
         let listener = E()
 
-        let producer = TimedEventProducer(dates: [NSDate(timeIntervalSinceNow: 1)])
+        let producer = TimedEventProducer(dates: [Date(timeIntervalSinceNow: 1)])
         producer.eventListener = listener
         producer.startProducingEvents()
 
         //Let's start producing event and then retry sending a notification.
-        let expectationToReceiveEvent = expectationWithDescription("Let's wait for an event")
+        let expectationToReceiveEvent = expectation(description: "Let's wait for an event")
         listener.onEventClosure = {
             expectationToReceiveEvent.fulfill()
         }
 
-        waitForExpectationsWithTimeout(1.5) { error in
+        waitForExpectations(timeout: 1.5) { error in
             if let _ = error {
                 XCTFail()
             }
@@ -54,24 +53,23 @@ class TimedEventProducer_TestCase: XCTestCase {
     func testNoEventProductionWhenStopped() {
         let listener = E()
 
-        let producer = TimedEventProducer(dates: [NSDate(timeIntervalSinceNow: 1)])
+        let producer = TimedEventProducer(dates: [Date(timeIntervalSinceNow: 1)])
         producer.eventListener = listener
         producer.startProducingEvents()
         producer.stopProducingEvents()
 
         //Ok, same thing but we stop producing events
-        let expectation = expectationWithDescription("Waiting for the timer to fire")
+        let e = expectation(description: "Waiting for the timer to fire")
         listener.onEventClosure = {
             XCTFail()
         }
 
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1.5 * Double(NSEC_PER_SEC)))
-        dispatch_after(delayTime, dispatch_get_main_queue()) {
-            expectation.fulfill()
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1500)) {
+            e.fulfill()
         }
 
         //Let's wait 1sec
-        waitForExpectationsWithTimeout(2) { error in
+        waitForExpectations(timeout: 2) { error in
         }
     }
 }

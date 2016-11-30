@@ -9,8 +9,8 @@
 import XCTest
 @testable import ConfigurationKit
 
-class DataTask: NSURLSessionDataTask {
-    var completion: ((NSData?, NSURLResponse?, NSError?) -> Void)?
+class DataTask: URLSessionDataTask {
+    var completion: ((Data?, URLResponse?, Error?) -> Void)?
     var call = true
 
     override func resume() {
@@ -21,10 +21,10 @@ class DataTask: NSURLSessionDataTask {
     }
 }
 
-class URLSession: NSURLSession {
+class FakeURLSession: URLSession {
     var call = true
 
-    override func dataTaskWithRequest(request: NSURLRequest, completionHandler: (NSData?, NSURLResponse?, NSError?) -> Void) -> NSURLSessionDataTask {
+    override func dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         let d = DataTask()
         d.completion = completionHandler
         d.call = call
@@ -33,31 +33,31 @@ class URLSession: NSURLSession {
 }
 
 class URLSessionDownloader_TestCase: XCTestCase {
-    let urlSession = URLSession()
+    let urlSession = FakeURLSession()
 
     func testCompletionGetsCalled() {
-        let expectation = expectationWithDescription("Wait for download data completion")
+        let e = expectation(description: "Wait for download data completion")
         let downloader = URLSessionDownloader(session: urlSession,
-            responseQueue: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0))
+            responseQueue: .global())
 
         urlSession.call = true
 
-        downloader.downloadData(NSURLRequest()) { data, error in
-            expectation.fulfill()
+        downloader.downloadData(with: URLRequest(url: URL(string: "http://google.com")!)) { data, error in
+            e.fulfill()
         }
 
-        waitForExpectationsWithTimeout(1) { error in
+        waitForExpectations(timeout: 1) { error in
             XCTAssertNil(error)
         }
     }
 
     func testHasPendingRequestIsTrue() {
         let downloader = URLSessionDownloader(session: urlSession,
-            responseQueue: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0))
+            responseQueue: .global())
 
         urlSession.call = false
 
-        downloader.downloadData(NSURLRequest()) { data, error in
+        downloader.downloadData(with: URLRequest(url: URL(string: "http://google.com")!)) { data, error in
             XCTFail()
         }
         XCTAssert(downloader.hasPendingRequest)
@@ -65,23 +65,23 @@ class URLSessionDownloader_TestCase: XCTestCase {
 
     func testNewDownloadCancelPreviousOne() {
         let downloader = URLSessionDownloader(session: urlSession,
-            responseQueue: dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0))
+            responseQueue: .global())
 
         urlSession.call = false
 
-        downloader.downloadData(NSURLRequest()) { data, error in
+        downloader.downloadData(with: URLRequest(url: URL(string: "http://google.com")!)) { data, error in
             XCTFail()
         }
 
         urlSession.call = true
 
-        let expectation = expectationWithDescription("Wait for download data completion")
-        downloader.downloadData(NSURLRequest()) { data, error in
+        let e = expectation(description: "Wait for download data completion")
+        downloader.downloadData(with: URLRequest(url: URL(string: "http://google.com")!)) { data, error in
             XCTAssertNil(error)
-            expectation.fulfill()
+            e.fulfill()
         }
 
-        waitForExpectationsWithTimeout(1) { error in
+        waitForExpectations(timeout: 1) { error in
             XCTAssertNil(error)
         }
     }
