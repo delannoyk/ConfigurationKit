@@ -19,7 +19,7 @@ public protocol Encryptor {
 
      - returns: The encrypted value of `data`.
      */
-    func encryptedData(data: NSData) -> NSData
+    func encrypted(_ data: Data) -> Data
 
     /**
      This should decrypt data using the algorithm you want (fitting your `encryptData:`
@@ -29,5 +29,5 @@ public protocol Encryptor {
 
      - returns: The decrypted value of `data`.
      */
-    func decryptedData(data: NSData) -> NSData
+    func decrypted(_ data: Data) -> Data
 }

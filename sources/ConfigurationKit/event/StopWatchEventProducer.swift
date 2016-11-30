@@ -13,10 +13,10 @@ import Foundation
  */
 public class StopWatchEventProducer: NSObject, EventProducer {
     /// The timer.
-    private var timer: NSTimer?
+    private var timer: Timer?
 
     /// The time interval used to generate events.
-    public var timeInterval: NSTimeInterval {
+    public var timeInterval: TimeInterval {
         didSet {
             if let _ = timer {
                 stopProducingEvents()
@@ -34,7 +34,7 @@ public class StopWatchEventProducer: NSObject, EventProducer {
 
      - parameter timeInterval: The time interval to wait before generating new events.
      */
-    public init(timeInterval: NSTimeInterval) {
+    public init(timeInterval: TimeInterval) {
         self.timeInterval = timeInterval
         super.init()
     }
@@ -55,7 +55,7 @@ public class StopWatchEventProducer: NSObject, EventProducer {
             return
         }
 
-        timer = NSTimer.scheduledTimerWithTimeInterval(timeInterval,
+        timer = Timer.scheduledTimer(timeInterval: timeInterval,
             target: WeakTarget(self),
             selector: .weakTargetSelector,
             userInfo: nil,
@@ -81,7 +81,7 @@ extension StopWatchEventProducer: WeakTargetDelegate {
 
      - parameter target: The weak target.
      */
-    func selectorCalledOnWeakTarget(target: WeakTarget) {
+    func selectorCalled(on weakTarget: WeakTarget) {
         eventListener?.onEvent()
     }
 }

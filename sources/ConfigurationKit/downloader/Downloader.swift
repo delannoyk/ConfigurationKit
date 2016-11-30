@@ -22,7 +22,7 @@ protocol Downloader {
      - parameter request:    The request to download data from.
      - parameter completion: The completion to call when data is ready.
      */
-    func downloadData(request: NSURLRequest, completion: (NSData?, ErrorType?) -> Void)
+    func downloadData(with request: URLRequest, completion: @escaping (Data?, Error?) -> Void)
 }
 
 /**
@@ -30,13 +30,13 @@ protocol Downloader {
  */
 class URLSessionDownloader: Downloader {
     /// The session to use.
-    let session: NSURLSession
+    let session: URLSession
 
     /// The response queue.
-    let responseQueue: dispatch_queue_t
+    let responseQueue: DispatchQueue
 
     /// The current task.
-    var currentTask: NSURLSessionDataTask?
+    var currentTask: URLSessionDataTask?
 
     /**
      Initializes an `URLSessionDownloader`.
@@ -44,7 +44,7 @@ class URLSessionDownloader: Downloader {
      - parameter session:       The session to use.
      - parameter responseQueue: The response queue.
      */
-    init(session: NSURLSession = NSURLSession.sharedSession(), responseQueue: dispatch_queue_t) {
+    init(session: URLSession = URLSession.shared, responseQueue: DispatchQueue) {
         self.session = session
         self.responseQueue = responseQueue
     }
@@ -64,17 +64,15 @@ class URLSessionDownloader: Downloader {
      - parameter request:    The request to download data from.
      - parameter completion: The completion to call when data is ready.
      */
-    func downloadData(request: NSURLRequest, completion: (NSData?, ErrorType?) -> Void) {
+    func downloadData(with request: URLRequest, completion: @escaping (Data?, Error?) -> Void) {
         if let currentTask = currentTask {
             currentTask.cancel()
         }
 
-        let task = session.dataTaskWithRequest(request) { [weak self] data, response, error in
-            if let strongSelf = self {
-                strongSelf.currentTask = nil
-                dispatch_sync(strongSelf.responseQueue) {
-                    completion(data, error)
-                }
+        let task = session.dataTask(with: request) { [weak self] data, response, error in
+            self?.currentTask = nil
+            self?.responseQueue.sync {
+                completion(data, error)
             }
         }
         currentTask = task

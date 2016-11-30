@@ -12,7 +12,7 @@ import Foundation
  *  This protocol is a copy of `EventListener` except that it isn't public. It allows
  *  `Configuration` to implement it internally and doesn't show publicly the implementation.
  */
-internal protocol InternalEventListener: class {
+protocol InternalEventListener: class {
     /**
      Called when an event occurs.
      */

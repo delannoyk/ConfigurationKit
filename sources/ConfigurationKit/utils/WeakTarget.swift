@@ -15,7 +15,7 @@ protocol WeakTargetDelegate: class {
 
      - parameter target: The target.
      */
-    func selectorCalledOnWeakTarget(target: WeakTarget)
+    func selectorCalled(on target: WeakTarget)
 }
 
 extension Selector {
@@ -46,7 +46,7 @@ class WeakTarget: NSObject {
 
      - parameter sender: Anything.
      */
-    @objc private func selector(sender: AnyObject) {
-        target?.selectorCalledOnWeakTarget(self)
+    @objc fileprivate func selector(_ sender: Any) {
+        target?.selectorCalled(on: self)
     }
 }

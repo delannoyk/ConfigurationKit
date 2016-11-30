@@ -13,7 +13,7 @@ import Foundation
  */
 public class TimedEventProducer: NSObject, EventProducer {
     /// The dates.
-    public private(set) var dates: [NSDate] {
+    public fileprivate(set) var dates: [Date] {
         didSet {
             if let _ = timer {
                 stopProducingEvents()
@@ -23,21 +23,21 @@ public class TimedEventProducer: NSObject, EventProducer {
     }
 
     /// The timer.
-    private var timer: NSTimer?
+    fileprivate var timer: Timer?
 
     /// The listener that will be alerted a new event occured.
     public weak var eventListener: EventListener?
 
 
     /**
-     Initialized a `TimedEventProducer` from an array of `NSDate`.
+     Initialized a `TimedEventProducer` from an array of `Date`.
 
      - parameter dates: The dates at which the producer should generate events.
      */
-    public init(dates: [NSDate]) {
+    public init(dates: [Date]) {
         self.dates = dates
             .filter { $0.timeIntervalSinceNow > 0 }
-            .sort { $0.compare($1) == .OrderedAscending }
+            .sorted { $0.compare($1) == .orderedAscending }
 
         super.init()
     }
@@ -59,7 +59,7 @@ public class TimedEventProducer: NSObject, EventProducer {
         }
 
         if let date = dates.first {
-            timer = NSTimer.scheduledTimerWithTimeInterval(date.timeIntervalSinceNow,
+            timer = Timer.scheduledTimer(timeInterval: date.timeIntervalSinceNow,
                 target: WeakTarget(self),
                 selector: .weakTargetSelector,
                 userInfo: nil,
@@ -84,9 +84,9 @@ extension TimedEventProducer: WeakTargetDelegate {
     /**
      Method that gets called when the timer ticks.
 
-     - parameter target: The weak target.
+     - parameter weakTarget: The weak target.
      */
-    func selectorCalledOnWeakTarget(target: WeakTarget) {
+    func selectorCalled(on weakTarget: WeakTarget) {
         eventListener?.onEvent()
         dates.removeFirst()
         timer = nil

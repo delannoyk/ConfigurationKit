@@ -11,43 +11,43 @@ import Foundation
 /**
  Possible errors that can be thrown.
 
- - PathExistsAndIsNotDirectory: Given path already exists and is not a directory.
+ - pathExistsAndIsNotDirectory: Given path already exists and is not a directory.
  */
-public enum FileCacherError: ErrorType {
-    case PathExistsAndIsNotDirectory
+public enum FileCacherError: Error {
+    case pathExistsAndIsNotDirectory
 }
 
 /**
  *  The FileManager. It exposes everything so that NSFileManager can be mocked.
  */
-internal protocol FileManager {
-    func createDirectoryAtPath(path: String,
-        withIntermediateDirectories createIntermediates: Bool,
-        attributes: [String : AnyObject]?) throws
-    func fileExistsAtPath(path: String, isDirectory: UnsafeMutablePointer<ObjCBool>) -> Bool
-    func removeItemAtURL(URL: NSURL) throws
-    func writeData(data: NSData, atURL URL: NSURL, withOptions options: FileCachingOptions) throws
-    func dataAtURL(URL: NSURL) -> NSData?
-    func attributesOfItemAtPath(path: String) throws -> [String : AnyObject]
+protocol FileManager {
+    func createDirectory(atPath path: String, withIntermediateDirectories createIntermediates: Bool, attributes: [String : Any]?) throws
+    func fileExists(atPath path: String, isDirectory: UnsafeMutablePointer<ObjCBool>?) -> Bool
+    func removeItem(at URL: URL) throws
+    func write(_ data: Data, to url: URL, options: FileCachingOptions) throws
+    func data(at url: URL) -> Data?
+    func attributesOfItem(atPath path: String) throws -> [FileAttributeKey : Any]
 }
 
-extension NSFileManager: FileManager {
-    func writeData(data: NSData, atURL URL: NSURL, withOptions options: FileCachingOptions) throws {
-        try data.writeToURL(URL, options: .DataWritingAtomic)
+extension Foundation.FileManager: FileManager {
+    func write(_ data: Data, to url: URL, options: FileCachingOptions) throws {
+        try data.write(to: url, options: .atomic)
 
-        try URL.setResourceValue(NSNumber(bool: !options.contains(.IncludeInBackup)),
-            forKey: NSURLIsExcludedFromBackupKey)
+        var mutableURL = url
+        var values = URLResourceValues()
+        values.isExcludedFromBackup = !options.contains(.includeInBackup)
+        try mutableURL.setResourceValues(values)
     }
 
-    func dataAtURL(URL: NSURL) -> NSData? {
-        return NSData(contentsOfURL: URL)
+    func data(at url: URL) -> Data? {
+        return try? Data(contentsOf: url)
     }
 }
 
 /**
  *  The possible options to save a file with.
  */
-public struct FileCachingOptions: OptionSetType {
+public struct FileCachingOptions: OptionSet {
     /// The raw value.
     public let rawValue: UInt
 
@@ -61,10 +61,10 @@ public struct FileCachingOptions: OptionSetType {
     }
 
     /// No specific options given.
-    public static let None = FileCachingOptions(rawValue: 0)
+    public static let none = FileCachingOptions(rawValue: 0)
 
     /// The file will be included in iTunes/iCloud backup.
-    public static let IncludeInBackup = FileCachingOptions(rawValue: 1)
+    public static let includeInBackup = FileCachingOptions(rawValue: 1)
 }
 
 /**
@@ -78,13 +78,13 @@ public struct FileCacher: Cacher {
     public let options: FileCachingOptions
 
     /// The file manager
-    internal let fileManager: FileManager
+    let fileManager: FileManager
 
     /// Initializes a FileCacher.
     public init(path: String, options: FileCachingOptions) {
         self.path = path
         self.options = options
-        self.fileManager = NSFileManager.defaultManager()
+        self.fileManager = Foundation.FileManager.default
     }
 
     /**
@@ -98,26 +98,22 @@ public struct FileCacher: Cacher {
      - throws: Throws an error if given path exists and isn't a directory or if directory creation
          fails.
      */
-    internal init(path: String,
-        options: FileCachingOptions,
-        fileManager: FileManager = NSFileManager.defaultManager()) throws {
-            self.path = path
-            self.options = options
-            self.fileManager = fileManager
+    init(path: String, options: FileCachingOptions, fileManager: FileManager = Foundation.FileManager.default) throws {
+        self.path = path
+        self.options = options
+        self.fileManager = fileManager
 
-            var isDirectory = ObjCBool(true)
-            let exists = fileManager.fileExistsAtPath(path, isDirectory: &isDirectory)
-            if exists {
-                //Ok it exists but is it a directory? If so, it's ok. Else, we got a problem.
-                if !isDirectory.boolValue {
-                    throw FileCacherError.PathExistsAndIsNotDirectory
-                }
-            } else {
-                //Let's create the directory
-                try fileManager.createDirectoryAtPath(path,
-                    withIntermediateDirectories: true,
-                    attributes: nil)
+        var isDirectory = ObjCBool(true)
+        let exists = fileManager.fileExists(atPath: path, isDirectory: &isDirectory)
+        if exists {
+            //Ok it exists but is it a directory? If so, it's ok. Else, we got a problem.
+            if !isDirectory.boolValue {
+                throw FileCacherError.pathExistsAndIsNotDirectory
             }
+        } else {
+            //Let's create the directory
+            try fileManager.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+        }
     }
 
     /**
@@ -128,9 +124,9 @@ public struct FileCacher: Cacher {
 
      - throws: Throws an error if caching failed.
      */
-    public func storeData(data: NSData, atKey key: String) throws {
-        let URL = NSURL(fileURLWithPath: path).URLByAppendingPathComponent(key)
-        try fileManager.writeData(data, atURL: URL, withOptions: options)
+    public func store(_ data: Data, at key: String) throws {
+        let url = URL(fileURLWithPath: path).appendingPathComponent(key)
+        try fileManager.write(data, to: url, options: options)
     }
 
     /**
@@ -138,10 +134,10 @@ public struct FileCacher: Cacher {
 
      - parameter key: The key where the data is supposed.
      */
-    public func removeDataAtKey(key: String) {
-        let URL = NSURL(fileURLWithPath: path).URLByAppendingPathComponent(key)
+    public func remove(at key: String) {
+        let url = URL(fileURLWithPath: path).appendingPathComponent(key)
         do {
-            try fileManager.removeItemAtURL(URL)
+            try fileManager.removeItem(at: url)
         } catch {}
     }
 
@@ -152,9 +148,9 @@ public struct FileCacher: Cacher {
 
      - returns: Stored data if existing or nil.
      */
-    public func dataAtKey(key: String) -> NSData? {
-        let URL = NSURL(fileURLWithPath: path).URLByAppendingPathComponent(key)
-        return fileManager.dataAtURL(URL)
+    public func data(at key: String) -> Data? {
+        let url = URL(fileURLWithPath: path).appendingPathComponent(key)
+        return fileManager.data(at: url)
     }
 
     /**
@@ -164,8 +160,8 @@ public struct FileCacher: Cacher {
 
      - returns: A boolean value indicating whether the cacher has data for a specific key
      */
-    public func hasDataAtKey(key: String) -> Bool {
-        let URL = NSURL(fileURLWithPath: path).URLByAppendingPathComponent(key)
-        return URL.path.map { fileManager.fileExistsAtPath($0, isDirectory: nil) } ?? false
+    public func hasData(at key: String) -> Bool {
+        let url = URL(fileURLWithPath: path).appendingPathComponent(key)
+        return fileManager.fileExists(atPath: url.path, isDirectory: nil)
     }
 }

@@ -10,7 +10,7 @@ import XCTest
 @testable import ConfigurationKit
 
 class E: EventListener {
-    var onEventClosure: (Void -> Void)?
+    var onEventClosure: ((Void) -> Void)?
     var eventCount = 0
 
     func onEvent() {
@@ -33,7 +33,7 @@ class ApplicationEventProducer_TestCase: XCTestCase {
         }
 
         //Let's try that
-        NSNotificationCenter.defaultCenter().postNotificationName(UIApplicationWillEnterForegroundNotification, object: UIApplication.sharedApplication())
+        NotificationCenter.default.post(name: .UIApplicationWillEnterForeground, object: UIApplication.shared)
     }
 
     func testEventProductionWhenStarted() {
@@ -44,14 +44,14 @@ class ApplicationEventProducer_TestCase: XCTestCase {
         producer.startProducingEvents()
 
         //Let's start producing event and then retry sending a notification.
-        let expectationToReceiveEvent = expectationWithDescription("Let's wait for an event")
+        let expectationToReceiveEvent = expectation(description: "Let's wait for an event")
         listener.onEventClosure = {
             expectationToReceiveEvent.fulfill()
         }
 
-        NSNotificationCenter.defaultCenter().postNotificationName(UIApplicationWillEnterForegroundNotification, object: UIApplication.sharedApplication())
+        NotificationCenter.default.post(name: .UIApplicationWillEnterForeground, object: UIApplication.shared)
 
-        waitForExpectationsWithTimeout(1) { error in
+        waitForExpectations(timeout: 1) { error in
             if let _ = error {
                 XCTFail()
             }
@@ -71,7 +71,7 @@ class ApplicationEventProducer_TestCase: XCTestCase {
             XCTFail()
         }
 
-        NSNotificationCenter.defaultCenter().postNotificationName(UIApplicationWillEnterForegroundNotification, object: UIApplication.sharedApplication())
+        NotificationCenter.default.post(name: .UIApplicationWillEnterForeground, object: UIApplication.shared)
     }
 
     func testEventsAreOnlyGeneratedOnceWhenStartIsCalledMultipleTimes() {
@@ -83,14 +83,14 @@ class ApplicationEventProducer_TestCase: XCTestCase {
         producer.startProducingEvents()
 
         //Let's start producing event and then retry sending a notification.
-        let expectationToReceiveEvent = expectationWithDescription("Let's wait for an event")
+        let expectationToReceiveEvent = expectation(description: "Let's wait for an event")
         listener.onEventClosure = {
             expectationToReceiveEvent.fulfill()
         }
 
-        NSNotificationCenter.defaultCenter().postNotificationName(UIApplicationWillEnterForegroundNotification, object: UIApplication.sharedApplication())
+        NotificationCenter.default.post(name: .UIApplicationWillEnterForeground, object: UIApplication.shared)
 
-        waitForExpectationsWithTimeout(1) { error in
+        waitForExpectations(timeout: 1) { error in
             XCTAssert(listener.eventCount == 1)
 
             if let _ = error {
@@ -113,6 +113,6 @@ class ApplicationEventProducer_TestCase: XCTestCase {
             XCTFail()
         }
 
-        NSNotificationCenter.defaultCenter().postNotificationName(UIApplicationWillEnterForegroundNotification, object: UIApplication.sharedApplication())
+        NotificationCenter.default.post(name: .UIApplicationWillEnterForeground, object: UIApplication.shared)
     }
 }

@@ -35,10 +35,10 @@ public class ApplicationEventProducer: NSObject, EventProducer {
             return
         }
 
-        NSNotificationCenter.defaultCenter().addObserver(self,
+        NotificationCenter.default.addObserver(self,
             selector: #selector(UIApplicationDelegate.applicationWillEnterForeground(_:)),
-            name: UIApplicationWillEnterForegroundNotification,
-            object: UIApplication.sharedApplication())
+            name: .UIApplicationWillEnterForeground,
+            object: UIApplication.shared)
         started = true
     }
 
@@ -50,9 +50,9 @@ public class ApplicationEventProducer: NSObject, EventProducer {
             return
         }
 
-        NSNotificationCenter.defaultCenter().removeObserver(self,
-            name: UIApplicationWillEnterForegroundNotification,
-            object: UIApplication.sharedApplication())
+        NotificationCenter.default.removeObserver(self,
+            name: .UIApplicationWillEnterForeground,
+            object: UIApplication.shared)
         started = false
     }
 
@@ -61,7 +61,7 @@ public class ApplicationEventProducer: NSObject, EventProducer {
 
      - parameter note: The notification.
      */
-    @objc private func applicationWillEnterForeground(note: NSNotification) {
+    @objc private func applicationWillEnterForeground(_ note: Notification) {
         eventListener?.onEvent()
     }
 }

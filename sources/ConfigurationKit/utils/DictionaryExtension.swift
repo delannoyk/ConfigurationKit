@@ -16,18 +16,18 @@ import Foundation
  - Removal:  A removal. The key doesn't exist anymore.
  */
 public enum Change<Key, Value> {
-    case Addition(Key, Value)
-    case Change(Key, Value, Value)
-    case Removal(Key, Value)
+    case addition(Key, Value)
+    case change(Key, Value, Value)
+    case removal(Key, Value)
 
     /// Returns the impacted key.
     public var key: Key {
         switch self {
-        case .Addition(let key, _):
+        case .addition(let key, _):
             return key
-        case .Change(let key, _, _):
+        case .change(let key, _, _):
             return key
-        case .Removal(let key, _):
+        case .removal(let key, _):
             return key
         }
     }
@@ -35,9 +35,9 @@ public enum Change<Key, Value> {
     /// Returns the old value.
     public var oldValue: Value? {
         switch self {
-        case .Change(_, let value, _):
+        case .change(_, let value, _):
             return value
-        case .Removal(_, let value):
+        case .removal(_, let value):
             return value
         default:
             return nil
@@ -47,9 +47,9 @@ public enum Change<Key, Value> {
     /// Returns the new value.
     public var newValue: Value? {
         switch self {
-        case .Addition(_, let value):
+        case .addition(_, let value):
             return value
-        case .Change(_, _, let value):
+        case .change(_, _, let value):
             return value
         default:
             return nil
@@ -59,7 +59,7 @@ public enum Change<Key, Value> {
     /// Returns a boolean value indicating whether the change is an addition or not.
     public var isAddition: Bool {
         switch self {
-        case .Addition:
+        case .addition:
             return true
         default:
             return false
@@ -69,7 +69,7 @@ public enum Change<Key, Value> {
     /// Returns a boolean value indicating whether the change is a value change or not.
     public var isChange: Bool {
         switch self {
-        case .Change:
+        case .change:
             return true
         default:
             return false
@@ -79,7 +79,7 @@ public enum Change<Key, Value> {
     /// Returns a boolean value indicating whether the change is a removal or not.
     public var isRemoval: Bool {
         switch self {
-        case .Removal:
+        case .removal:
             return true
         default:
             return false
@@ -95,25 +95,25 @@ extension Dictionary where Value: Equatable {
 
      - returns: List of changes.
      */
-    func delta(other: [Key: Value]) -> [Change<Key, Value>] {
+    func delta(_ other: [Key: Value]) -> [Change<Key, Value>] {
         var changes = [Change<Key, Value>]()
         //Let's look for changes and removals
         for (key, lhsValue) in self {
             if let rhsValue = other[key] {
                 if lhsValue != rhsValue {
                     //Value changes
-                    changes.append(.Change(key, lhsValue, rhsValue))
+                    changes.append(.change(key, lhsValue, rhsValue))
                 }
             } else {
                 //Removal
-                changes.append(.Removal(key, lhsValue))
+                changes.append(.removal(key, lhsValue))
             }
         }
 
         //Let's look for additions
         let keys = other.keys.filter { (self[$0] == nil) }
         for key in keys {
-            changes.append(.Addition(key, other[key]!))
+            changes.append(.addition(key, other[key]!))
         }
         return changes
     }

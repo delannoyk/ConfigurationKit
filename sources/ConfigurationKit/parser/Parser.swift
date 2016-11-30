@@ -23,5 +23,5 @@ public protocol Parser {
 
      - returns: A valid configuration.
      */
-    func parseData(data: NSData) throws -> [String: String]
+    func parse(_ data: Data) throws -> [String: String]
 }

@@ -12,8 +12,8 @@ import XCTest
 class FlatJSONParser_TestCase: XCTestCase {
     //Test parsing
     func testSuccessParsing() {
-        let URL = NSBundle(forClass: self.dynamicType).URLForResource("SampleConfig", withExtension: "json")
-        let data = NSData(contentsOfURL: URL!)!
+        let URL = Bundle(for: type(of: self)).url(forResource: "SampleConfig", withExtension: "json")
+        let data = try! Data(contentsOf: URL!)
 
         let parser = FlatJSONParser()
         let result: [String: String]
@@ -37,23 +37,13 @@ class FlatJSONParser_TestCase: XCTestCase {
     }
 
     func testFailureParsing() {
-        let URL = NSBundle(forClass: self.dynamicType).URLForResource("SampleConfig", withExtension: "plist")
-        let data = NSData(contentsOfURL: URL!)!
+        let URL = Bundle(for: type(of: self)).url(forResource: "SampleConfig", withExtension: "plist")
+        let data = try! Data(contentsOf: URL!)
 
         let parser = FlatJSONParser()
-
-        let expectation = expectationWithDescription("Asserting we pass in the catch")
         do {
             let _ = try parser.parseData(data)
             XCTFail()
-        } catch {
-            expectation.fulfill()
-        }
-
-        waitForExpectationsWithTimeout(1) { error in
-            if let _ = error {
-                XCTFail()
-            }
-        }
+        } catch {}
     }
 }

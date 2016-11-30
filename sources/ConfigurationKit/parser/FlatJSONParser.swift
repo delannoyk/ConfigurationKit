@@ -13,8 +13,8 @@ import Foundation
 
  - PListIsNotValidDictionary: The PList isn't castable as a [String: String].
  */
-public enum FlatJSONParsingError: ErrorType {
-    case JSONIsNotFlatDictionaryOfStrings
+public enum FlatJSONParsingError: Error {
+    case jsonIsNotFlatDictionaryOfStrings
 }
 
 /**
@@ -34,13 +34,13 @@ public struct FlatJSONParser: Parser {
 
      - returns: A valid configuration.
      */
-    public func parseData(data: NSData) throws -> [String: String] {
-        let JSONObject = try NSJSONSerialization.JSONObjectWithData(data,
+    public func parse(_ data: Data) throws -> [String: String] {
+        let JSONObject = try JSONSerialization.jsonObject(with: data,
             options: [])
 
         if let JSONObject = JSONObject as? [String: String] {
             return JSONObject
         }
-        throw FlatJSONParsingError.JSONIsNotFlatDictionaryOfStrings
+        throw FlatJSONParsingError.jsonIsNotFlatDictionaryOfStrings
     }
 }

@@ -13,8 +13,8 @@ import Foundation
 
  - PListIsNotValidDictionary: The PList isn't castable as a [String: String].
  */
-public enum PListParsingError: ErrorType {
-    case PListIsNotValidDictionary
+public enum PListParsingError: Error {
+    case plistIsNotValidDictionary
 }
 
 /**
@@ -34,14 +34,14 @@ public struct PListParser: Parser {
 
      - returns: A valid configuration.
      */
-    public func parseData(data: NSData) throws -> [String: String] {
-        let plist = try NSPropertyListSerialization.propertyListWithData(data,
+    public func parse(_ data: Data) throws -> [String: String] {
+        let plist = try PropertyListSerialization.propertyList(from: data,
             options: [],
             format: nil)
 
         if let dictionary = plist as? [String: String] {
             return dictionary
         }
-        throw PListParsingError.PListIsNotValidDictionary
+        throw PListParsingError.plistIsNotValidDictionary
     }
 }

@@ -20,14 +20,14 @@ public protocol Cacher {
 
      - throws: Throws an error if caching failed.
      */
-    func storeData(data: NSData, atKey key: String) throws
+    func store(_ data: Data, at key: String) throws
 
     /**
      Removes previously stored data.
 
      - parameter key: The key where the data is supposed.
      */
-    func removeDataAtKey(key: String)
+    func remove(at key: String)
 
     /**
      Retrieves previously stored data.
@@ -36,7 +36,7 @@ public protocol Cacher {
 
      - returns: Stored data if existing or nil.
      */
-    func dataAtKey(key: String) -> NSData?
+    func data(at key: String) -> Data?
 
     /**
      Returns a boolean value indicating whether the cacher has data for a specific key.
@@ -45,5 +45,5 @@ public protocol Cacher {
 
      - returns: A boolean value indicating whether the cacher has data for a specific key
      */
-    func hasDataAtKey(key: String) -> Bool
+    func hasData(at key: String) -> Bool
 }

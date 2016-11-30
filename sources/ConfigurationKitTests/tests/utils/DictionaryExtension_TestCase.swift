@@ -27,7 +27,7 @@ class DictionaryExtension_TestCase: XCTestCase {
             XCTAssert(!$0.isRemoval)
             XCTAssert($0.oldValue == d1[$0.key])
             XCTAssert($0.newValue == d2[$0.key])
-            XCTAssert($0.oldValue == $0.newValue?.lowercaseString)
+            XCTAssert($0.oldValue == $0.newValue?.lowercased())
         }
     }
 

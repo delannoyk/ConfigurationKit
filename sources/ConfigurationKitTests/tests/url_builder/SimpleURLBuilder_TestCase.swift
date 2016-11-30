@@ -1,5 +1,5 @@
 //
-//  SimpleURLBuilder_TestCase.swift
+//  SimpleURLRequestBuilder_TestCase.swift
 //  ConfigurationKit
 //
 //  Created by Kevin DELANNOY on 01/01/15.
@@ -9,27 +9,19 @@
 import XCTest
 import ConfigurationKit
 
-class SimpleURLBuilder_TestCase: XCTestCase {
+class SimpleURLRequestBuilder_TestCase: XCTestCase {
     //Testing URLRequest
     func testURLRequest() {
-        if let URL = NSURL(string: "https://github.com/delannoyk") {
-            let URLRequest = NSURLRequest(URL: URL)
-            let URLBuilder = SimpleURLBuilder(urlRequest: URLRequest)
-            XCTAssert(URLBuilder.URLRequest() == URLRequest, "URLRequest should be the same as the URLRequest given at initialization")
-        }
-        else {
-            XCTFail("URL isn't valid")
-        }
+        let url = URL(string: "https://github.com/delannoyk")!
+        let request = URLRequest(url: url)
+        let requestBuilder = SimpleURLRequestBuilder(urlRequest: request)
+        XCTAssert(requestBuilder.URLRequest() == request, "URLRequest should be the same as the URLRequest given at initialization")
     }
 
     //Testing URL
     func testURL() {
-        if let URL = NSURL(string: "https://github.com/delannoyk") {
-            let URLBuilder = SimpleURLBuilder(URL: URL)
-            XCTAssert(URLBuilder.URLRequest().URL == URL, "URL of URLRequest should be the same as the URL given at initialization")
-        }
-        else {
-            XCTFail("URL isn't valid")
-        }
+        let url = URL(string: "https://github.com/delannoyk")
+        let requestBuilder = SimpleURLRequestBuilder(URL: url)
+        XCTAssert(requestBuilder.URLRequest().url == url, "URL of URLRequest should be the same as the URL given at initialization")
     }
 }

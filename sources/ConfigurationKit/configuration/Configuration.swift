@@ -34,7 +34,7 @@ public protocol ConfigurationDelegate: class {
 
      - parameter configuration: The configuration.
      */
-    func configurationWillBeginCycle(configuration: Configuration)
+    func configurationWillBeginCycle(_ configuration: Configuration)
 
     /**
      Alerts that the configuration found a change after downloading and parsing a new configuration
@@ -43,7 +43,7 @@ public protocol ConfigurationDelegate: class {
      - parameter configuration: The configuration.
      - parameter change:        The change that has been detected.
      */
-    func configuration(configuration: Configuration, didDetectChange change: Change<String, String>)
+    func configuration(_ configuration: Configuration, didDetectChange change: Change<String, String>)
 
     /**
      Lets you know that the configuration did end the current cycle.
@@ -51,7 +51,7 @@ public protocol ConfigurationDelegate: class {
      - parameter configuration: The configuration.
      - parameter error:         The error that happened if any.
      */
-    func configuration(configuration: Configuration, didEndCycleWithError error: ErrorType?)
+    func configuration(_ configuration: Configuration, didEndCycleWithError error: Error?)
 }
 
 /**
@@ -75,68 +75,68 @@ private final class WeakDelegate {
  *  <#Description#>
  */
 public class Configuration {
-    private enum InitializationError: ErrorType {
-        case FileDoesNotExist
+    private enum InitializationError: Error {
+        case fileDoesNotExist
     }
 
     /// The fake event listener
     private let eventListener = ConfigurationEventListener()
 
     /// The lock used to access configuration.
-    private let configurationMutex = NSLock()
+    fileprivate let configurationMutex = NSLock()
 
     /// The lock used to prevent multiple events to override each other.
-    private let cycleMutex = NSLock()
+    fileprivate let cycleMutex = NSLock()
 
     /// The queue used to perform cycles.
-    private let cycleQueue = dispatch_queue_create("be.delannoyk.configurationkit", nil)
+    fileprivate let cycleQueue = DispatchQueue(label: "be.delannoyk.configurationkit")
 
     /// The delegates.
     private var weakDelegates = [WeakDelegate]()
 
     /// The current configuration.
-    private var configuration: [String: String]
+    fileprivate var configuration: [String: String]
 
     /// The encryptor used to decrypt downloaded file.
-    private let downloadEncryptor: Encryptor?
+    fileprivate let downloadEncryptor: Encryptor?
 
     /// The encryptor used to encrypt/decrypt the configuration cached.
-    private let cacheEncryptor: Encryptor?
+    fileprivate let cacheEncryptor: Encryptor?
 
     /// The cacher to use to make the configuration persistent.
-    private let cacher: Cacher?
+    fileprivate let cacher: Cacher?
 
     /// The builder used to create an URL when needed.
-    private let urlBuilder: URLBuilder
+    fileprivate let urlRequestBuilder: URLRequestBuilder
 
     /// The parser used to parse a configuration file.
-    private let parser: Parser
+    fileprivate let parser: Parser
 
     /// The list of event producers that generate events when a new cycle should be started.
     private let eventProducers: [EventProducer]
 
     /// The downloader used to download a configuration file.
-    internal var downloader: Downloader
+    var downloader: Downloader
 
     /// Let's you specify whether an new event should cancel any current request to be sure you
     /// always have the latest version of the configuration.
     public var newEventCancelCurrentOne: Bool
 
     /// The date of the last refresh of configuration.
-    public private(set) final var configurationDate: NSDate
+    public fileprivate(set) final var configurationDate: Date
 
     /// The date when the last cycle happened.
-    public private(set) final var lastCycleDate: NSDate?
+    public fileprivate(set) final var lastCycleDate: Date?
 
     /// The error that happened at last cycle if any.
-    public private(set) final var lastCycleError: ErrorType?
+    public fileprivate(set) final var lastCycleError: Error?
 
 
     /// The Cache information to use.
     public typealias CacheInitializer = (Cacher?, Encryptor?)
 
     /// The Download information to use.
-    public typealias DownloadInitializer = (URLBuilder, Parser, Encryptor?)
+    public typealias DownloadInitializer = (URLRequestBuilder, Parser, Encryptor?)
 
 
     /**
@@ -161,12 +161,12 @@ public class Configuration {
             downloadEncryptor = downloadInitializer.2
             cacheEncryptor = cacheInitializer?.1
             cacher = cacheInitializer?.0
-            urlBuilder = downloadInitializer.0
+            urlRequestBuilder = downloadInitializer.0
             parser = downloadInitializer.1
             eventProducers = cycleGenerators
             downloader = URLSessionDownloader(responseQueue: cycleQueue)
             self.newEventCancelCurrentOne = newEventCancelCurrentOne
-            configurationDate = NSDate()
+            configurationDate = Date()
 
             commonInit()
     }
@@ -196,7 +196,7 @@ public class Configuration {
                 cycleGenerators: cycleGenerators,
                 newEventCancelCurrentOne: newEventCancelCurrentOne,
                 initialConfigurationFilePath: initialConfigurationFilePath,
-                fileManager: NSFileManager.defaultManager())
+                fileManager: Foundation.FileManager.default)
     }
 
     /**
@@ -215,7 +215,7 @@ public class Configuration {
          be treated as a remote file (decrypted and parsed).
      - parameter fileManager:                  The file manager used to get content of the file.
      */
-    internal init(downloadInitializer: DownloadInitializer,
+    init(downloadInitializer: DownloadInitializer,
         cacheInitializer: CacheInitializer? = nil,
         cycleGenerators: [EventProducer],
         newEventCancelCurrentOne: Bool = false,
@@ -224,28 +224,28 @@ public class Configuration {
             downloadEncryptor = downloadInitializer.2
             cacheEncryptor = cacheInitializer?.1
             cacher = cacheInitializer?.0
-            urlBuilder = downloadInitializer.0
+            urlRequestBuilder = downloadInitializer.0
             parser = downloadInitializer.1
             eventProducers = cycleGenerators
             downloader = URLSessionDownloader(responseQueue: cycleQueue)
             self.newEventCancelCurrentOne = newEventCancelCurrentOne
 
             configuration = [:]
-            configurationDate = NSDate()
+            configurationDate = Date()
 
             //FIXME: I hate to use `!`.
-            if cacher == nil || !cacher!.hasDataAtKey(Cache.Configuration.key) {
+            if cacher == nil || !cacher!.hasData(at: Cache.configuration.key) {
                 do {
-                    let URL = NSURL(fileURLWithPath: initialConfigurationFilePath)
-                    guard let data = fileManager.dataAtURL(URL) else {
-                        throw InitializationError.FileDoesNotExist
+                    let url = URL(fileURLWithPath: initialConfigurationFilePath)
+                    guard let data = fileManager.data(at: url) else {
+                        throw InitializationError.fileDoesNotExist
                     }
 
-                    let decrypted = downloadEncryptor?.decryptedData(data) ?? data
-                    configuration = try parser.parseData(decrypted)
+                    let decrypted = downloadEncryptor?.decrypted(data) ?? data
+                    configuration = try parser.parse(decrypted)
 
-                    let attr = try fileManager.attributesOfItemAtPath(initialConfigurationFilePath)
-                    configurationDate = (attr[NSFileModificationDate] as? NSDate) ?? NSDate()
+                    let attr = try fileManager.attributesOfItem(atPath: initialConfigurationFilePath)
+                    configurationDate = (attr[.modificationDate] as? Date) ?? Date()
                 } catch { }
             }
 
@@ -257,16 +257,16 @@ public class Configuration {
      */
     private func commonInit() {
         //Initializing from cache if possible
-        if let confData = cacher?.dataAtKey(Cache.Configuration.key) {
-            let data = cacheEncryptor?.decryptedData(confData) ?? confData
-            if let cached = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? [String: String] {
+        if let confData = cacher?.data(at: Cache.configuration.key) {
+            let data = cacheEncryptor?.decrypted(confData) ?? confData
+            if let cached = NSKeyedUnarchiver.unarchiveObject(with: data) as? [String: String] {
                 configuration = cached
             }
         }
 
-        if let dateData = cacher?.dataAtKey(Cache.Date.key) {
-            let data = cacheEncryptor?.decryptedData(dateData) ?? dateData
-            if let cached = NSKeyedUnarchiver.unarchiveObjectWithData(data) as? NSDate {
+        if let dateData = cacher?.data(at: Cache.date.key) {
+            let data = cacheEncryptor?.decrypted(dateData) ?? dateData
+            if let cached = NSKeyedUnarchiver.unarchiveObject(with: data) as? Date {
                 configurationDate = cached
             }
         }
@@ -338,15 +338,15 @@ public class Configuration {
      - Date:          The last successful configuration refresh date.
      */
     private enum Cache {
-        case Configuration
-        case Date
+        case configuration
+        case date
 
         /// The key for the data to be cached at.
         var key: String {
             switch self {
-            case .Configuration:
+            case .configuration:
                 return "configuration"
-            case .Date:
+            case .date:
                 return "date"
             }
         }
@@ -367,12 +367,12 @@ extension Configuration: InternalEventListener {
             $0.configurationWillBeginCycle(self)
         }
 
-        dispatch_async(cycleQueue) { [weak self] in
+        cycleQueue.async { [weak self] in
             if let strongSelf = self {
                 strongSelf.cycleMutex.lock()
 
-                let request = strongSelf.urlBuilder.URLRequest()
-                strongSelf.downloader.downloadData(request) { data, error in
+                let request = strongSelf.urlRequestBuilder.urlRequest()
+                strongSelf.downloader.downloadData(with: request) { data, error in
                     if let data = data {
                         do {
                             try self?.handleData(data)
@@ -388,7 +388,7 @@ extension Configuration: InternalEventListener {
 
                     if let strongSelf = self {
                         strongSelf.cycleMutex.unlock()
-                        strongSelf.lastCycleDate = NSDate()
+                        strongSelf.lastCycleDate = Date()
 
                         strongSelf.delegates.forEach {
                             $0.configuration(strongSelf,
@@ -407,14 +407,14 @@ extension Configuration: InternalEventListener {
 
      - throws: Rethrows cacher error if any.
      */
-    func handleData(data: NSData) throws {
-        let decryptedData = downloadEncryptor?.decryptedData(data) ?? data
-        let newConfiguration = try parser.parseData(decryptedData)
+    func handleData(_ data: Data) throws {
+        let decryptedData = downloadEncryptor?.decrypted(data) ?? data
+        let newConfiguration = try parser.parse(decryptedData)
         let differences = configuration.delta(newConfiguration)
 
         configurationMutex.lock()
         configuration = newConfiguration
-        configurationDate = NSDate()
+        configurationDate = Date()
         configurationMutex.unlock()
 
         //Fire delegate events
@@ -425,16 +425,16 @@ extension Configuration: InternalEventListener {
         }
 
         //Let's cache
-        let data = NSKeyedArchiver.archivedDataWithRootObject(configurationDate)
-        let dateData = cacheEncryptor?.encryptedData(data) ?? data
+        let data = NSKeyedArchiver.archivedData(withRootObject: configurationDate)
+        let dateData = cacheEncryptor?.encrypted(data) ?? data
 
         if differences.count > 0 {
-            let data = NSKeyedArchiver.archivedDataWithRootObject(configuration)
-            let configurationData = cacheEncryptor?.encryptedData(data) ?? data
+            let data = NSKeyedArchiver.archivedData(withRootObject: configuration)
+            let configurationData = cacheEncryptor?.encrypted(data) ?? data
 
-            try cacher?.storeData(configurationData, atKey: "configuration")
+            try cacher?.store(configurationData, at: "configuration")
         }
-        try cacher?.storeData(dateData, atKey: "configuration_date")
+        try cacher?.store(dateData, at: "configuration_date")
 
         lastCycleError = nil
     }
@@ -444,7 +444,7 @@ extension Configuration: InternalEventListener {
 
      - parameter error: The error.
      */
-    func handleError(error: ErrorType) {
+    func handleError(_ error: Error) {
         lastCycleError = error
     }
 }
