@@ -25,8 +25,9 @@ class Configuration_TestCase: XCTestCase {
     class FakeDownloader: Downloader {
         var hasPendingRequest = false
 
-        var onDownload: ((NSURLRequest, (NSData?, ErrorType?) -> Void) -> Void)?
-        func downloadData(request: NSURLRequest, completion: (NSData?, ErrorType?) -> Void) {
+        var onDownload: ((URLRequest, (Data?, Error?) -> Void) -> Void)?
+
+        func downloadData(with request: URLRequest, completion: @escaping (Data?, Error?) -> Void) {
             hasPendingRequest = true
             onDownload?(request) { [weak self] in
                 self?.hasPendingRequest = false
@@ -36,45 +37,45 @@ class Configuration_TestCase: XCTestCase {
     }
 
     class FakeCacher: Cacher {
-        var cache = [String: NSData]()
+        var cache = [String: Data]()
 
-        func storeData(data: NSData, atKey key: String) throws {
+        func store(_ data: Data, at key: String) throws {
             cache[key] = data
         }
 
-        func removeDataAtKey(key: String) {
-            cache.removeValueForKey(key)
+        func remove(at key: String) {
+            cache.removeValue(forKey: key)
         }
 
-        func dataAtKey(key: String) -> NSData? {
+        func data(at key: String) -> Data? {
             return cache[key]
         }
 
-        func hasDataAtKey(key: String) -> Bool {
+        func hasData(at key: String) -> Bool {
             return cache[key] != nil
         }
     }
 
     class Delegate: ConfigurationDelegate {
-        var onChange: (Change<String, String> -> Void)?
-        var onEnd: (ErrorType? -> Void)?
-        var onBegin: (Void -> Void)?
+        var onChange: ((Change<String, String>) -> Void)?
+        var onEnd: ((Error?) -> Void)?
+        var onBegin: ((Void) -> Void)?
 
-        func configuration(configuration: Configuration, didDetectChange change: Change<String, String>) {
+        func configuration(_ configuration: Configuration, didDetectChange change: Change<String, String>) {
             onChange?(change)
         }
 
-        func configuration(configuration: Configuration, didEndCycleWithError error: ErrorType?) {
+        func configuration(_ configuration: Configuration, didEndCycleWithError error: Error?) {
             onEnd?(error)
         }
 
-        func configurationWillBeginCycle(configuration: Configuration) {
+        func configurationWillBeginCycle(_ configuration: Configuration) {
             onBegin?()
         }
     }
 
 
-    let download: Configuration.DownloadInitializer = (SimpleURLBuilder(URL: NSURL()), FlatJSONParser(), nil)
+    let download: Configuration.DownloadInitializer = (SimpleURLRequestBuilder(url: URL(string: "http://google.com")!), FlatJSONParser(), nil)
 
     func testConfigurationStartsEventProducersAndSetDelegate() {
         let eventProducer = E()
@@ -96,19 +97,19 @@ class Configuration_TestCase: XCTestCase {
     }
 
     func testConfigurationHasInitialKeysWhenUsingCacher() {
-        let path = NSURL(fileURLWithPath: "configuration").path!
+        let path = URL(fileURLWithPath: "configuration").path
         let fileContent = "{\"a\": \"0\", \"b\": \"1\"}"
-        let date = NSDate(timeIntervalSince1970: 0)
+        let date = Date(timeIntervalSince1970: 0)
 
         let fileManager = FakeManager()
         fileManager.onData = { url in
-            if let p = url.path where p == path {
-                return fileContent.dataUsingEncoding(NSUTF8StringEncoding)
+            if url.path == path {
+                return fileContent.data(using: .utf8)
             }
             return nil
         }
         fileManager.onAttributes = { path in
-            return [NSFileModificationDate: date]
+            return [.modificationDate: date]
         }
 
         let configuration = Configuration(downloadInitializer: download,
@@ -156,13 +157,13 @@ class Configuration_TestCase: XCTestCase {
         configuration.registerDelegate(delegate)
         configuration.downloader = FakeDownloader()
 
-        let expectation = expectationWithDescription("Waiting for delegate to get called")
+        let e = expectation(description: "Waiting for delegate to get called")
         delegate.onBegin = {
-            expectation.fulfill()
+            e.fulfill()
         }
         eventProducer.eventListener?.onEvent()
 
-        waitForExpectationsWithTimeout(1) { error in
+        waitForExpectations(timeout: 1) { error in
             configuration.unregisterDelegate(delegate)
             XCTAssertEqual(configuration.delegates.count, 0)
 
@@ -182,24 +183,24 @@ class Configuration_TestCase: XCTestCase {
         configuration.downloader = downloader
 
         downloader.onDownload = { request, completion in
-            completion("{\"a\": \"1\"}".dataUsingEncoding(NSUTF8StringEncoding), nil)
+            completion("{\"a\": \"1\"}".data(using: .utf8), nil)
         }
 
         let delegate = Delegate()
         configuration.registerDelegate(delegate)
 
-        let expectation = expectationWithDescription("Waiting for delegate to get called")
+        let e = expectation(description: "Waiting for delegate to get called")
         delegate.onChange = { change in
             XCTAssert(change.isChange)
             XCTAssertEqual(change.key, "a")
             XCTAssertEqual(change.oldValue, "0")
             XCTAssertEqual(change.newValue, "1")
-            expectation.fulfill()
+            e.fulfill()
         }
 
         eventProducer.eventListener?.onEvent()
 
-        waitForExpectationsWithTimeout(1) { error in
+        waitForExpectations(timeout: 1) { error in
             if let _ = error {
                 XCTFail()
             }
@@ -216,24 +217,24 @@ class Configuration_TestCase: XCTestCase {
         configuration.downloader = downloader
 
         downloader.onDownload = { request, completion in
-            completion("{}".dataUsingEncoding(NSUTF8StringEncoding), nil)
+            completion("{}".data(using: .utf8), nil)
         }
 
         let delegate = Delegate()
         configuration.registerDelegate(delegate)
 
-        let expectation = expectationWithDescription("Waiting for delegate to get called")
+        let e = expectation(description: "Waiting for delegate to get called")
         delegate.onChange = { change in
             XCTAssert(change.isRemoval)
             XCTAssertEqual(change.key, "a")
             XCTAssertEqual(change.oldValue, "0")
             XCTAssertNil(change.newValue)
-            expectation.fulfill()
+            e.fulfill()
         }
 
         eventProducer.eventListener?.onEvent()
 
-        waitForExpectationsWithTimeout(1) { error in
+        waitForExpectations(timeout: 1) { error in
             if let _ = error {
                 XCTFail()
             }
@@ -250,24 +251,24 @@ class Configuration_TestCase: XCTestCase {
         configuration.downloader = downloader
 
         downloader.onDownload = { request, completion in
-            completion("{\"a\": \"0\", \"b\": \"1\"}".dataUsingEncoding(NSUTF8StringEncoding), nil)
+            completion("{\"a\": \"0\", \"b\": \"1\"}".data(using: .utf8), nil)
         }
 
         let delegate = Delegate()
         configuration.registerDelegate(delegate)
 
-        let expectation = expectationWithDescription("Waiting for delegate to get called")
+        let e = expectation(description: "Waiting for delegate to get called")
         delegate.onChange = { change in
             XCTAssert(change.isAddition)
             XCTAssertEqual(change.key, "b")
             XCTAssertNil(change.oldValue)
             XCTAssertEqual(change.newValue, "1")
-            expectation.fulfill()
+            e.fulfill()
         }
 
         eventProducer.eventListener?.onEvent()
 
-        waitForExpectationsWithTimeout(1) { error in
+        waitForExpectations(timeout: 1) { error in
             if let _ = error {
                 XCTFail()
             }
@@ -276,8 +277,8 @@ class Configuration_TestCase: XCTestCase {
 
     func testConfigurationInitialConfigurationWithCacher() {
         let cacher = FakeCacher()
-        cacher.cache["configuration"] = NSKeyedArchiver.archivedDataWithRootObject(["a":"1", "b":"2"])
-        cacher.cache["date"] = NSKeyedArchiver.archivedDataWithRootObject(NSDate())
+        cacher.cache["configuration"] = NSKeyedArchiver.archivedData(withRootObject: ["a":"1", "b":"2"])
+        cacher.cache["date"] = NSKeyedArchiver.archivedData(withRootObject: Date())
 
         let configuration = Configuration(downloadInitializer: download,
             cacheInitializer: (cacher, nil),

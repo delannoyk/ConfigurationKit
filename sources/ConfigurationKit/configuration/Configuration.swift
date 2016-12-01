@@ -310,7 +310,7 @@ public class Configuration {
 
      - parameter delegate: The delegate.
      */
-    public final func registerDelegate(delegate: ConfigurationDelegate) {
+    public final func registerDelegate(_ delegate: ConfigurationDelegate) {
         weakDelegates.append(WeakDelegate(delegate))
     }
 
@@ -319,7 +319,7 @@ public class Configuration {
 
      - parameter delegate: The delegate.
      */
-    public final func unregisterDelegate(delegate: ConfigurationDelegate) {
+    public final func unregisterDelegate(_ delegate: ConfigurationDelegate) {
         weakDelegates = weakDelegates.filter {
             return !($0.delegate === delegate || $0.delegate == nil)
         }

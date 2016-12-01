@@ -9,51 +9,49 @@
 import XCTest
 @testable import ConfigurationKit
 
-class FakeManager: FileManager {
-    var customInfo = [String: NSData]()
+class FakeManager: ConfigurationKit.FileManager {
+    var customInfo = [String: Data]()
 
-    var onCreate: ((String, Bool, [String: AnyObject]?) throws -> ())?
-    var onFileExists: ((String, UnsafeMutablePointer<ObjCBool>) -> Bool)?
-    var onRemove: (NSURL throws -> ())?
-    var onWrite: ((NSData, NSURL, FileCachingOptions) throws -> ())?
-    var onData: (NSURL -> NSData?)?
-    var onAttributes: (String throws -> [String: AnyObject])?
+    var onCreate: ((String, Bool, [String: Any]?) throws -> ())?
+    var onFileExists: ((String, UnsafeMutablePointer<ObjCBool>?) -> Bool)?
+    var onRemove: ((URL) throws -> ())?
+    var onWrite: ((Data, URL, FileCachingOptions) throws -> ())?
+    var onData: ((URL) -> Data?)?
+    var onAttributes: ((String) throws -> [FileAttributeKey: Any])?
 
-    func createDirectoryAtPath(path: String,
-        withIntermediateDirectories createIntermediates: Bool,
-        attributes: [String : AnyObject]?) throws {
-            try onCreate?(path, createIntermediates, attributes)
+    func createDirectory(atPath path: String, withIntermediateDirectories createIntermediates: Bool, attributes: [String : Any]?) throws {
+        try onCreate?(path, createIntermediates, attributes)
     }
 
-    func fileExistsAtPath(path: String, isDirectory: UnsafeMutablePointer<ObjCBool>) -> Bool {
+    func fileExists(atPath path: String, isDirectory: UnsafeMutablePointer<ObjCBool>?) -> Bool {
         return onFileExists?(path, isDirectory) ?? true
     }
 
-    func removeItemAtURL(URL: NSURL) throws {
+    func removeItem(at URL: URL) throws {
         try onRemove?(URL)
     }
 
-    func writeData(data: NSData, atURL URL: NSURL, withOptions options: FileCachingOptions) throws {
-        try onWrite?(data, URL, options)
+    func write(_ data: Data, to url: URL, options: FileCachingOptions) throws {
+        try onWrite?(data, url, options)
     }
 
-    func dataAtURL(URL: NSURL) -> NSData? {
-        return onData?(URL)
+    func data(at url: URL) -> Data? {
+        return onData?(url)
     }
 
-    func attributesOfItemAtPath(path: String) throws -> [String : AnyObject] {
+    func attributesOfItem(atPath path: String) throws -> [FileAttributeKey : Any] {
         return try onAttributes?(path) ?? [:]
     }
 }
 
 class FileCacher_TestCase: XCTestCase {
-    let path = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
+    let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
 
     func testCreationWherePathExistsAndIsADirectory() {
         let manager = FakeManager()
 
         manager.onFileExists = { a, b in
-            b.memory = true
+            b?.pointee = true
             return true
         }
 
@@ -66,7 +64,7 @@ class FileCacher_TestCase: XCTestCase {
         let manager = FakeManager()
 
         manager.onFileExists = { a, b in
-            b.memory = false
+            b?.pointee = false
             return true
         }
 
@@ -83,7 +81,7 @@ class FileCacher_TestCase: XCTestCase {
             throw NSError(domain: "", code: -1, userInfo: nil)
         }
         manager.onFileExists = { a, b in
-            b.memory = false
+            b?.pointee = false
             return false
         }
 
@@ -97,7 +95,7 @@ class FileCacher_TestCase: XCTestCase {
         let manager = FakeManager()
 
         manager.onFileExists = { a, b in
-            b.memory = false
+            b?.pointee = false
             return false
         }
 
@@ -107,21 +105,21 @@ class FileCacher_TestCase: XCTestCase {
     }
 
     func testStoring() {
-        let expectation = expectationWithDescription("Waiting for onWrite")
+        let e = expectation(description: "Waiting for onWrite")
 
         let manager = FakeManager()
         manager.onFileExists = { a, b in
-            b.memory = false
+            b?.pointee = false
             return false
         }
         manager.onWrite = { data, url, options in
-            expectation.fulfill()
+            e.fulfill()
         }
 
         let cacher = try! FileCacher(path: path, options: [], fileManager: manager)
-        try! cacher.storeData("abc".dataUsingEncoding(NSASCIIStringEncoding)!, atKey: "key")
+        try! cacher.store("abc".data(using: .ascii)!, at: "key")
 
-        waitForExpectationsWithTimeout(1) { e in
+        waitForExpectations(timeout: 1) { e in
             XCTAssertNil(e)
         }
     }
@@ -129,17 +127,17 @@ class FileCacher_TestCase: XCTestCase {
     func testRetrievingWithStore() {
         let manager = FakeManager()
         manager.onFileExists = { a, b in
-            b.memory = false
+            b?.pointee = false
             return false
         }
-        manager.onWrite = { (data: NSData, url: NSURL, options: FileCachingOptions) in
-            manager.customInfo[url.path!] = data
+        manager.onWrite = { (data: Data, url: URL, options: FileCachingOptions) in
+            manager.customInfo[url.path] = data
         }
         manager.onData = { url in
-            return manager.customInfo[url.path!]
+            return manager.customInfo[url.path]
         }
         manager.onRemove = { url in
-            manager.customInfo.removeValueForKey(url.path!)
+            manager.customInfo.removeValue(forKey: url.path)
         }
 
         let cacher = try! FileCacher(path: path, options: [], fileManager: manager)
@@ -148,15 +146,15 @@ class FileCacher_TestCase: XCTestCase {
             return manager.customInfo[a] != nil
         }
 
-        try! cacher.storeData("abc".dataUsingEncoding(NSASCIIStringEncoding)!, atKey: "key")
+        try! cacher.store("abc".data(using: .ascii)!, at: "key")
 
-        let data: NSData! = cacher.dataAtKey("key")
+        let data: Data! = cacher.data(at: "key")
         XCTAssertNotNil(data)
-        XCTAssertEqual(String(data: data, encoding: NSASCIIStringEncoding), "abc")
-        XCTAssert(cacher.hasDataAtKey("key"))
+        XCTAssertEqual(String(data: data, encoding: .ascii), "abc")
+        XCTAssert(cacher.hasData(at: "key"))
 
-        cacher.removeDataAtKey("key")
-        XCTAssertNil(cacher.dataAtKey("key"))
-        XCTAssertFalse(cacher.hasDataAtKey("key"))
+        cacher.remove(at: "key")
+        XCTAssertNil(cacher.data(at: "key"))
+        XCTAssertFalse(cacher.hasData(at: "key"))
     }
 }
