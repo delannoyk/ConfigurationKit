@@ -277,6 +277,9 @@ public class Configuration {
             $0.eventListener = eventListener
             $0.startProducingEvents()
         }
+        
+        //Starting initial loading
+        onEvent()
     }
 
     /**
