@@ -21,7 +21,7 @@ public enum FileCacherError: Error {
  *  The FileManager. It exposes everything so that NSFileManager can be mocked.
  */
 protocol FileManager {
-    func createDirectory(atPath path: String, withIntermediateDirectories createIntermediates: Bool, attributes: [String : Any]?) throws
+    func createDirectory(atPath path: String, withIntermediateDirectories createIntermediates: Bool, attributes: [FileAttributeKey: Any]?) throws
     func fileExists(atPath path: String, isDirectory: UnsafeMutablePointer<ObjCBool>?) -> Bool
     func removeItem(at URL: URL) throws
     func write(_ data: Data, to url: URL, options: FileCachingOptions) throws

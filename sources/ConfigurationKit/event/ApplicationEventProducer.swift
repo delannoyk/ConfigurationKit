@@ -35,9 +35,10 @@ public class ApplicationEventProducer: NSObject, EventProducer {
             return
         }
 
-        NotificationCenter.default.addObserver(self,
+        NotificationCenter.default.addObserver(
+            self,
             selector: #selector(UIApplicationDelegate.applicationWillEnterForeground(_:)),
-            name: .UIApplicationWillEnterForeground,
+            name: UIApplication.willEnterForegroundNotification,
             object: UIApplication.shared)
         started = true
     }
@@ -50,8 +51,9 @@ public class ApplicationEventProducer: NSObject, EventProducer {
             return
         }
 
-        NotificationCenter.default.removeObserver(self,
-            name: .UIApplicationWillEnterForeground,
+        NotificationCenter.default.removeObserver(
+            self,
+            name: UIApplication.willEnterForegroundNotification,
             object: UIApplication.shared)
         started = false
     }

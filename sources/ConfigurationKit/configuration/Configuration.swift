@@ -330,7 +330,7 @@ public class Configuration {
 
     /// The registered delegates.
     public final var delegates: [ConfigurationDelegate] {
-        return weakDelegates.flatMap { $0.delegate }
+        return weakDelegates.compactMap { $0.delegate }
     }
 
 
